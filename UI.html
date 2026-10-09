@@ -1,0 +1,1807 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Doko — Prototipo de Sistema</title>
+    <style>
+        :root {
+            --blue: #0A4FBF;
+            --cyan: #00C2D1;
+            --bg: #F7F9FC;
+            --surface: #FFFFFF;
+            --text: #1A1A1A;
+            --text2: #6B7280;
+            --green: #1E9E63;
+            --amber: #D1A500;
+            --red: #D64545;
+            --border: #E4E8F0;
+        }
+
+        body.dark {
+            --bg: #0E1320;
+            --surface: #1A2131;
+            --text: #F1F4F9;
+            --text2: #8D97AC;
+            --border: #2A3244;
+            --blue: #4C86F0;
+            --cyan: #2FE4EF;
+        }
+
+        body {
+            transition: background .2s ease;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Inter, Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        #app {
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* ---- Login / Tenant select ---- */
+        .center-screen {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            width: 100%;
+            background: linear-gradient(135deg, #eef3fb, #f7f9fc);
+        }
+
+        body.dark .center-screen {
+            background: linear-gradient(135deg, #0a0d15, #141a28);
+        }
+
+        .dark-toggle-corner {
+            position: absolute;
+            top: 20px;
+            right: 24px;
+        }
+
+        .auth-card {
+            background: var(--surface);
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(10, 79, 191, 0.16), 0 0 0 1px rgba(10, 79, 191, 0.05);
+            padding: 42px;
+            width: 370px;
+            text-align: center;
+        }
+
+        .auth-card .logo {
+            font-size: 36px;
+            font-weight: 800;
+            background: linear-gradient(120deg, var(--cyan), var(--blue));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 4px;
+            filter: drop-shadow(0 2px 12px rgba(0, 194, 209, 0.25));
+        }
+
+        .auth-card .tagline {
+            color: var(--text2);
+            font-size: 13px;
+            margin-bottom: 26px;
+        }
+
+        .field {
+            text-align: left;
+            margin-bottom: 14px;
+        }
+
+        .field label {
+            font-size: 12px;
+            color: var(--text2);
+            font-weight: 600;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .field input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 9px 10px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            background: var(--surface);
+            color: var(--text);
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 9px 18px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: .15s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(120deg, var(--cyan), var(--blue));
+            color: #fff;
+            box-shadow: 0 4px 16px rgba(10, 79, 191, 0.28);
+        }
+
+        .btn-primary:hover {
+            filter: brightness(1.06);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(10, 79, 191, 0.35);
+        }
+
+        .btn-secondary {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg);
+        }
+
+        .btn-block {
+            width: 100%;
+        }
+
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+
+        .tenant-grid {
+            display: flex;
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .tenant-card {
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            width: 180px;
+            cursor: pointer;
+            transition: .15s;
+            background: var(--surface);
+        }
+
+        .tenant-card:hover {
+            border-color: var(--blue);
+            box-shadow: 0 8px 20px rgba(10, 79, 191, 0.18);
+            transform: translateY(-3px);
+        }
+
+        .tenant-card .emoji {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .tenant-card .name {
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .tenant-card .type {
+            font-size: 12px;
+            color: var(--text2);
+            margin-top: 2px;
+        }
+
+        /* ---- Shell ---- */
+        #sidebar {
+            width: 230px;
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            transition: .2s;
+        }
+
+        #sidebar .brand {
+            padding: 20px 18px 14px 18px;
+            font-size: 22px;
+            font-weight: 800;
+            background: linear-gradient(120deg, var(--cyan), var(--blue));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            border-bottom: 1px solid var(--border);
+            filter: drop-shadow(0 1px 6px rgba(0, 194, 209, 0.2));
+        }
+
+        #sidebar nav {
+            flex: 1;
+            padding: 10px;
+            overflow-y: auto;
+        }
+
+        #sidebar nav a {
+            display: block;
+            padding: 9px 12px;
+            border-radius: 8px;
+            color: var(--text);
+            text-decoration: none;
+            font-size: 13.5px;
+            margin-bottom: 2px;
+            cursor: pointer;
+            border-left: 3px solid transparent;
+            transition: .15s;
+        }
+
+        #sidebar nav a:hover {
+            background: var(--bg);
+        }
+
+        #sidebar nav a.active {
+            background: linear-gradient(90deg, rgba(0, 194, 209, 0.12), rgba(10, 79, 191, 0.08));
+            color: var(--blue);
+            font-weight: 700;
+            border-left: 3px solid var(--blue);
+        }
+
+        #sidebar .demo-tools {
+            padding: 12px;
+            border-top: 1px solid var(--border);
+            font-size: 11px;
+            color: var(--text2);
+        }
+
+        #sidebar .demo-tools button {
+            margin-top: 6px;
+            width: 100%;
+        }
+
+        #main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .impersonate-banner {
+            background: linear-gradient(120deg, var(--cyan), var(--blue));
+            color: #fff;
+            padding: 7px 20px;
+            font-size: 12.5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .impersonate-banner a {
+            color: #fff;
+            text-decoration: underline;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        #topbar {
+            height: 56px;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            flex-shrink: 0;
+        }
+
+        #topbar .tenant-name {
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        #topbar .module-switch select {
+            width: auto;
+            font-size: 13px;
+        }
+
+        #topbar .user-chip {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--cyan), var(--blue));
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        #content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 26px;
+        }
+
+        h1.page-title {
+            font-size: 20px;
+            margin: 0 0 4px 0;
+        }
+
+        .page-sub {
+            color: var(--text2);
+            font-size: 13px;
+            margin-bottom: 20px;
+        }
+
+        .cards-row {
+            display: flex;
+            gap: 14px;
+            margin-bottom: 22px;
+            flex-wrap: wrap;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px 18px;
+            min-width: 150px;
+            flex: 1;
+            box-shadow: 0 1px 3px rgba(16, 24, 40, 0.05);
+        }
+
+        .stat-card .label {
+            font-size: 12px;
+            color: var(--text2);
+            font-weight: 600;
+        }
+
+        .stat-card .value {
+            font-size: 24px;
+            font-weight: 800;
+            margin-top: 4px;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 18px;
+            box-shadow: 0 1px 3px rgba(16, 24, 40, 0.05);
+        }
+
+        .card h3 {
+            margin: 0 0 12px 0;
+            font-size: 15px;
+        }
+
+        table.data {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13.5px;
+        }
+
+        table.data th {
+            background: var(--bg);
+            color: var(--text2);
+            text-align: left;
+            padding: 9px 10px;
+            font-size: 11.5px;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: .03em;
+        }
+
+        table.data td {
+            padding: 9px 10px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        table.data tr.clickable {
+            cursor: pointer;
+        }
+
+        table.data tr.clickable:hover {
+            background: var(--bg);
+        }
+
+        .pill {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 999px;
+            font-size: 11.5px;
+            font-weight: 700;
+            letter-spacing: .01em;
+        }
+
+        .pill-green {
+            background: #e5f6ee;
+            color: var(--green);
+        }
+
+        .pill-amber {
+            background: #fdf3d8;
+            color: #8a6d00;
+        }
+
+        .pill-red {
+            background: #fbe9e9;
+            color: var(--red);
+        }
+
+        .pill-blue {
+            background: #eaf1fd;
+            color: var(--blue);
+        }
+
+        .pill-gray {
+            background: #eef0f3;
+            color: var(--text2);
+        }
+
+        body.dark .pill-green {
+            background: rgba(30, 158, 99, 0.18);
+        }
+
+        body.dark .pill-amber {
+            background: rgba(209, 165, 0, 0.18);
+            color: #e8c545;
+        }
+
+        body.dark .pill-red {
+            background: rgba(214, 69, 69, 0.18);
+        }
+
+        body.dark .pill-blue {
+            background: rgba(76, 134, 240, 0.18);
+        }
+
+        body.dark .pill-gray {
+            background: rgba(141, 151, 172, 0.18);
+        }
+
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .toolbar .filters {
+            display: flex;
+            gap: 8px;
+        }
+
+        .toolbar .filters select,
+        .toolbar .filters input {
+            width: auto;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 14px;
+            color: var(--blue);
+            font-size: 13px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        /* Drawer */
+        #overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(10, 20, 40, 0.4);
+            opacity: 0;
+            pointer-events: none;
+            transition: .2s;
+            z-index: 50;
+        }
+
+        #overlay.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        #drawer {
+            position: fixed;
+            top: 0;
+            right: 0;
+            height: 100%;
+            width: 420px;
+            background: var(--surface);
+            box-shadow: -10px 0 34px rgba(0, 0, 0, 0.18);
+            transform: translateX(100%);
+            transition: .25s;
+            z-index: 51;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #drawer.open {
+            transform: translateX(0);
+        }
+
+        #drawer .drawer-header {
+            padding: 18px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        #drawer .drawer-header h3 {
+            margin: 0;
+            font-size: 16px;
+        }
+
+        #drawer .drawer-body {
+            padding: 20px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        #drawer .drawer-footer {
+            padding: 16px 20px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        .drawer-close {
+            cursor: pointer;
+            font-size: 18px;
+            color: var(--text2);
+            background: none;
+            border: none;
+        }
+
+        /* Kanban */
+        .kanban {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+
+        .kcol {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 10px;
+            min-width: 220px;
+            flex-shrink: 0;
+        }
+
+        .kcol h4 {
+            font-size: 12.5px;
+            margin: 2px 6px 10px 6px;
+            color: var(--text2);
+            text-transform: uppercase;
+        }
+
+        .kcard {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            padding: 10px 12px;
+            margin-bottom: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            cursor: pointer;
+            font-size: 13px;
+            transition: .15s;
+        }
+
+        .kcard:hover {
+            outline: 2px solid var(--cyan);
+            transform: translateY(-1px);
+        }
+
+        .kcard .kname {
+            font-weight: 700;
+        }
+
+        .kcard .ksub {
+            color: var(--text2);
+            font-size: 11.5px;
+            margin-top: 2px;
+        }
+
+        /* Table map */
+        .floor-tabs {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 14px;
+        }
+
+        .floor-tabs button {
+            padding: 6px 14px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text);
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .floor-tabs button.active {
+            background: linear-gradient(120deg, var(--cyan), var(--blue));
+            color: #fff;
+            border-color: transparent;
+        }
+
+        .map-grid {
+            display: grid;
+            grid-template-columns: repeat(10, 54px);
+            gap: 8px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .map-cell {
+            width: 54px;
+            height: 54px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            border: 2px dashed #d5dbe6;
+            color: #b7bfcc;
+        }
+
+        body.dark .map-cell {
+            border-color: #3A4254;
+            color: #5b6478;
+        }
+
+        .map-cell.table {
+            border-style: solid;
+            color: #fff;
+        }
+
+        .map-cell.libre {
+            background: var(--green);
+            border-color: var(--green);
+        }
+
+        .map-cell.ocupada {
+            background: var(--red);
+            border-color: var(--red);
+        }
+
+        .map-cell.cuenta {
+            background: var(--amber);
+            border-color: var(--amber);
+        }
+
+        .legend {
+            display: flex;
+            gap: 16px;
+            margin-top: 12px;
+            font-size: 12.5px;
+            color: var(--text2);
+        }
+
+        .legend span {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .legend i {
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+            display: inline-block;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text2);
+        }
+
+        .empty-state .big {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+
+        .empty-state h3 {
+            color: var(--text);
+            margin: 0 0 6px 0;
+        }
+
+        .error-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .error-state .big {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+
+        .error-state h3 {
+            color: var(--red);
+            margin: 0 0 6px 0;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        .doc-preview {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 640px;
+            margin: 0 auto;
+        }
+
+        .doc-preview .dp-header {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 2px solid var(--blue);
+            padding-bottom: 14px;
+            margin-bottom: 16px;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: var(--green);
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-size: 13.5px;
+            font-weight: 600;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+            z-index: 60;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="app"></div>
+    <div id="overlay" onclick="closeDrawer()"></div>
+    <div id="drawer">
+        <div class="drawer-header">
+            <h3 id="drawerTitle">Título</h3>
+            <button class="drawer-close" onclick="closeDrawer()">✕</button>
+        </div>
+        <div class="drawer-body" id="drawerBody"></div>
+        <div class="drawer-footer" id="drawerFooter"></div>
+    </div>
+    <div class="toast" id="toast"></div>
+
+    <script>
+        /* ============================= DATA ============================= */
+        let idSeq = 1000;
+        const nextId = () => idSeq++;
+
+        let gymMembers = [
+            { id: 1, name: "Carlos Pérez", phone: "809-555-0101", status: "activo", plan: "1 mes", expires: "2026-08-20", joined: "2025-11-02", optOut: false },
+            { id: 2, name: "María Santos", phone: "809-555-0142", status: "vencido", plan: "1 mes", expires: "2026-07-28", joined: "2025-09-14", optOut: false },
+            { id: 3, name: "Luis Rodríguez", phone: "809-555-0177", status: "activo", plan: "3 meses", expires: "2026-09-10", joined: "2026-01-05", optOut: false },
+            { id: 4, name: "Ana Gómez", phone: "809-555-0199", status: "archivado", plan: "1 mes", expires: "2026-04-01", joined: "2025-06-20", optOut: false },
+            { id: 5, name: "Pedro Familia", phone: "809-555-0233", status: "activo", plan: "12 meses", expires: "2027-01-15", joined: "2026-01-15", optOut: false },
+        ];
+        let gymPlans = [
+            { id: 1, name: "Pase 1 día", days: 1, price: 250 },
+            { id: 2, name: "1 mes", days: 30, price: 1800 },
+            { id: 3, name: "3 meses", days: 90, price: 4800 },
+            { id: 4, name: "6 meses", days: 180, price: 8500 },
+            { id: 5, name: "12 meses", days: 365, price: 15000 },
+        ];
+        let gymProducts = [
+            { id: 1, name: "Creatina 300g", category: "Suplementos", price: 850, cost: 500, stock: 12, low: 5 },
+            { id: 2, name: "Proteína Whey 2lb", category: "Suplementos", price: 2200, cost: 1500, stock: 3, low: 5 },
+            { id: 3, name: "Guantes de entrenamiento", category: "Accesorios", price: 450, cost: 250, stock: 20, low: 5 },
+            { id: 4, name: "Toalla deportiva", category: "Accesorios", price: 300, cost: 150, stock: 8, low: 5 },
+        ];
+        let gymPromotions = [
+            { id: 1, name: "Día del Padre", discount: "20%", vigente: "01/06/2026 - 20/06/2026", plans: "1 mes, 3 meses" },
+        ];
+        let checkins = [];
+
+        let properties = [
+            { id: 1, title: "Villa moderna en Bella Vista", price: "US$ 245,000", location: "Santo Domingo", status: "disponible", emoji: "🏡" },
+            { id: 2, title: "Apartamento 2 hab. Piantini", price: "US$ 138,000", location: "Piantini, Santo Domingo", status: "disponible", emoji: "🏢" },
+            { id: 3, title: "Casa de campo Jarabacoa", price: "US$ 190,000", location: "Jarabacoa", status: "vendida", emoji: "🏔️" },
+            { id: 4, title: "Local comercial Naco", price: "US$ 95,000", location: "Naco, Santo Domingo", status: "alquilada", emoji: "🏬" },
+        ];
+        let leads = [
+            { id: 1, name: "Wellington Veras", phone: "809-555-0301", source: "Facebook", stage: "Nuevo", propertyId: 1, notes: "Interesado en visitar el fin de semana." },
+            { id: 2, name: "Carmen Objio", phone: "809-555-0322", source: "Instagram", stage: "Contactado", propertyId: 2, notes: "Pidió más fotos del interior." },
+            { id: 3, name: "Rafael Cruz", phone: "809-555-0355", source: "Referido", stage: "Interesado", propertyId: 1, notes: "Ya visitó, evaluando financiamiento." },
+            { id: 4, name: "Julissa Peña", phone: "809-555-0388", source: "Facebook", stage: "Propuesta enviada", propertyId: 4, notes: "Dossier enviado el 28/07." },
+            { id: 5, name: "Manuel Ortiz", phone: "809-555-0399", source: "Instagram", stage: "Cerrado", propertyId: 3, notes: "Cierre completado." },
+        ];
+        const stages = ["Nuevo", "Contactado", "Interesado", "Propuesta enviada", "Cerrado", "Perdido"];
+
+        let floors = [
+            {
+                level: 1, tables: [
+                    { id: 1, row: 0, col: 0, status: "libre" }, { id: 2, row: 0, col: 2, status: "ocupada" },
+                    { id: 3, row: 0, col: 4, status: "cuenta" }, { id: 4, row: 2, col: 0, status: "libre" },
+                    { id: 5, row: 2, col: 2, status: "libre" },
+                ]
+            },
+            {
+                level: 2, tables: [
+                    { id: 6, row: 0, col: 0, status: "libre" }, { id: 7, row: 0, col: 2, status: "ocupada" },
+                ]
+            },
+        ];
+        let menu = [
+            { id: 1, name: "Mofongo con camarones", price: 650 },
+            { id: 2, name: "Chicharrón de pollo", price: 480 },
+            { id: 3, name: "Jugo de chinola", price: 120 },
+            { id: 4, name: "Tres leches", price: 220 },
+            { id: 5, name: "Ensalada César", price: 380 },
+        ];
+        let orders = [];
+        let orderHistory = [];
+
+        /* ============================= TENANTS (negocios registrados) ============================= */
+        let tenants = [
+            { id: 1, businessName: "PowerFit Gym", ownerName: "Carlos Fitness", phone: "809-555-1000", module: "gym", loginEmail: "dueno@powerfit.com", emoji: "🏋️" },
+            { id: 2, businessName: "Nexo Inmuebles", ownerName: "Wellintong Veras", phone: "809-555-2000", module: "re", loginEmail: "dueno@nexoinmuebles.com", emoji: "🏠" },
+            { id: 3, businessName: "El Fogón", ownerName: "Doña Rosa", phone: "809-555-3000", module: "rest", loginEmail: "dueno@elfogon.com", emoji: "🍽️" },
+        ];
+        const moduleTypeLabel = { gym: "Gimnasio", re: "Agencia inmobiliaria", rest: "Restaurante" };
+
+        /* ============================= STATE ============================= */
+        let state = { view: "login", role: null, currentModule: null, currentTenant: null, viewingAs: false, selectedFloor: 0, cart: [], selectedTableId: null };
+
+        /* ============================= HELPERS ============================= */
+        function pill(text, kind) { return `<span class="pill pill-${kind}">${text}</span>`; }
+        function statusPillGym(s) {
+            if (s === "activo") return pill("Activo", "green");
+            if (s === "vencido") return pill("Vencido", "red");
+            return pill("Archivado", "gray");
+        }
+        function statusPillProp(s) {
+            if (s === "disponible") return pill("Disponible", "green");
+            if (s === "vendida") return pill("Vendida", "blue");
+            return pill("Alquilada", "amber");
+        }
+        function stagePill(s) {
+            if (s === "Cerrado") return pill(s, "green");
+            if (s === "Perdido") return pill(s, "red");
+            return pill(s, "blue");
+        }
+        function tableStatusPill(s) {
+            if (s === "libre") return pill("Libre", "green");
+            if (s === "ocupada") return pill("Ocupada", "red");
+            return pill("Cuenta pedida", "amber");
+        }
+        function showToast(msg) {
+            const t = document.getElementById("toast");
+            t.textContent = msg; t.style.display = "block";
+            setTimeout(() => { t.style.display = "none"; }, 2600);
+        }
+        function money(n) { return "RD$ " + Number(n).toLocaleString("es-DO"); }
+
+        /* ============================= DRAWER ============================= */
+        function openDrawer(title, bodyHtml, footerHtml) {
+            document.getElementById("drawerTitle").textContent = title;
+            document.getElementById("drawerBody").innerHTML = bodyHtml;
+            document.getElementById("drawerFooter").innerHTML = footerHtml || "";
+            document.getElementById("drawer").classList.add("open");
+            document.getElementById("overlay").classList.add("open");
+        }
+        function closeDrawer() {
+            document.getElementById("drawer").classList.remove("open");
+            document.getElementById("overlay").classList.remove("open");
+        }
+
+        /* ============================= NAV / RENDER ============================= */
+        function nav(view) { state.view = view; render(); }
+
+        function doLogin() {
+            const email = document.getElementById("loginEmail").value.trim().toLowerCase();
+            const tenant = tenants.find(t => t.loginEmail.toLowerCase() === email);
+            if (!tenant) { showToast("Negocio no encontrado. Verifica el correo o contacta a soporte."); return; }
+            state.role = "client";
+            state.currentTenant = tenant;
+            state.currentModule = tenant.module;
+            state.viewingAs = false;
+            nav(tenant.module + "_dashboard");
+        }
+        function goSuperAdminLogin() {
+            state.role = "superadmin";
+            state.currentTenant = null;
+            state.currentModule = null;
+            nav("superadmin_dashboard");
+        }
+        function logout() {
+            state = { view: "login", role: null, currentModule: null, currentTenant: null, viewingAs: false, selectedFloor: 0, cart: [], selectedTableId: null };
+            render();
+        }
+        function viewAsTenant(id) {
+            const t = tenants.find(x => x.id === id);
+            state.currentTenant = t;
+            state.currentModule = t.module;
+            state.viewingAs = true;
+            nav(t.module + "_dashboard");
+        }
+        function backToSuperAdmin() {
+            state.currentTenant = null;
+            state.currentModule = null;
+            state.viewingAs = false;
+            nav("superadmin_dashboard");
+        }
+        function toggleDarkMode() {
+            document.body.classList.toggle("dark");
+        }
+
+        function sidebarItems(mod) {
+            if (mod === "gym") return [
+                ["gym_dashboard", "Dashboard"], ["gym_members", "Miembros"], ["gym_plans", "Planes y Tarifas"],
+                ["gym_checkout", "Cobrar"], ["gym_store", "Tienda"], ["gym_promotions", "Promociones"],
+                ["gym_winback", "Reingreso"], ["gym_automations", "Automatizaciones"], ["gym_checkin", "Check-in"], ["gym_reports", "Reportes"]
+            ];
+            if (mod === "re") return [
+                ["re_dashboard", "Dashboard"], ["re_properties", "Propiedades"], ["re_leads", "Leads (Pipeline)"],
+                ["re_dossier", "Generar Propuesta"], ["re_automations", "Automatizaciones"], ["re_reports", "Reportes"]
+            ];
+            if (mod === "rest") return [
+                ["rest_dashboard", "Dashboard"], ["rest_map_edit", "Mapa de Mesas (Editar)"], ["rest_map_live", "Mapa de Mesas (En vivo)"],
+                ["rest_new_order", "Nuevo Pedido"], ["rest_kitchen", "Cocina"], ["rest_history", "Historial de Pedidos"]
+            ];
+            return [];
+        }
+        const moduleLabel = { gym: "Gimnasio PowerFit", re: "Agencia Nexo Inmuebles", rest: "Restaurante El Fogón" };
+
+        function render() {
+            const appEl = document.getElementById("app");
+            if (state.view === "login") {
+                appEl.innerHTML = renderLogin(); return;
+            }
+            if (state.role === "superadmin" && !state.currentModule) {
+                appEl.innerHTML = renderSuperAdminShell(); return;
+            }
+            // Shell de cliente (o super admin "viendo como" un negocio)
+            const mod = state.currentModule;
+            const items = sidebarItems(mod);
+            appEl.innerHTML = `
+    <div id="sidebar">
+      <div class="brand">Doko</div>
+      <nav>
+        ${items.map(([v, l]) => `<a class="${state.view === v ? 'active' : ''}" onclick="nav('${v}')">${l}</a>`).join("")}
+      </nav>
+      <div class="demo-tools">
+        Modo demo
+        <button class="btn btn-secondary btn-sm" onclick="nav('demo_empty')">Ver estado vacío</button>
+        <button class="btn btn-secondary btn-sm" onclick="nav('demo_error')">Ver estado de error</button>
+      </div>
+    </div>
+    <div id="main">
+      ${state.viewingAs ? `<div class="impersonate-banner">🔧 Viendo como <b>${state.currentTenant.businessName}</b> (modo soporte Super Admin) <a onclick="backToSuperAdmin()">← Volver a Super Admin</a></div>` : ""}
+      <div id="topbar">
+        <div class="tenant-name">${state.currentTenant.emoji} ${state.currentTenant.businessName}</div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <button class="btn btn-secondary btn-sm" onclick="toggleDarkMode()">🌓 Oscuro</button>
+          <button class="btn btn-secondary btn-sm" onclick="logout()">Cerrar sesión</button>
+          <div class="user-chip">${state.currentTenant.ownerName.charAt(0)}</div>
+        </div>
+      </div>
+      <div id="content">${renderView()}</div>
+    </div>
+  `;
+        }
+
+        function renderLogin() {
+            return `
+  <div class="center-screen">
+    <button class="btn btn-secondary btn-sm dark-toggle-corner" onclick="toggleDarkMode()">🌓 Oscuro</button>
+    <div class="auth-card">
+      <div class="logo">Doko</div>
+      <div class="tagline">Gestión simple para tu negocio</div>
+      <div class="field"><label>Correo electrónico</label><input id="loginEmail" type="email" value="dueno@powerfit.com"></div>
+      <div class="field"><label>Contraseña</label><input type="password" value="••••••••"></div>
+      <button class="btn btn-primary btn-block" onclick="doLogin()">Iniciar sesión</button>
+      <p style="font-size:11.5px;color:var(--text2);margin-top:12px;">Prueba con: dueno@powerfit.com · dueno@nexoinmuebles.com · dueno@elfogon.com</p>
+      <div style="border-top:1px solid var(--border);margin-top:18px;padding-top:14px;">
+        <a style="font-size:12.5px;color:var(--blue);cursor:pointer;font-weight:600;" onclick="goSuperAdminLogin()">¿Eres del equipo de UXcode Solutions? Entrar como Super Admin</a>
+      </div>
+    </div>
+  </div>`;
+        }
+
+        function renderSuperAdminShell() {
+            return `
+  <div id="sidebar">
+    <div class="brand">Doko</div>
+    <div style="padding:0 14px;font-size:11px;color:var(--text2);text-transform:uppercase;font-weight:700;margin-bottom:6px;">Super Admin</div>
+    <nav>
+      <a class="active">Negocios registrados</a>
+    </nav>
+  </div>
+  <div id="main">
+    <div id="topbar">
+      <div class="tenant-name">🛠️ UXcode Solutions — Panel Super Admin</div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <button class="btn btn-secondary btn-sm" onclick="toggleDarkMode()">🌓 Oscuro</button>
+        <button class="btn btn-secondary btn-sm" onclick="logout()">Cerrar sesión</button>
+        <div class="user-chip">J</div>
+      </div>
+    </div>
+    <div id="content">${renderSuperAdminDashboard()}</div>
+  </div>`;
+        }
+
+        function renderSuperAdminDashboard() {
+            return `
+  <h1 class="page-title">Negocios registrados</h1>
+  <div class="page-sub">Registra un negocio nuevo y luego compártele sus credenciales para que inicie sesión directo en su sistema.</div>
+  <div class="toolbar"><div></div><button class="btn btn-primary" onclick="openTenantDrawer()">+ Registrar nuevo negocio</button></div>
+  <div class="card" style="padding:0;">
+    <table class="data"><tr><th></th><th>Negocio</th><th>Dueño</th><th>Tipo</th><th>Correo de acceso</th><th></th></tr>
+      ${tenants.map(t => `<tr>
+        <td style="font-size:20px;">${t.emoji}</td>
+        <td>${t.businessName}</td>
+        <td>${t.ownerName}</td>
+        <td>${pill(moduleTypeLabel[t.module], "blue")}</td>
+        <td style="font-size:12.5px;color:var(--text2);">${t.loginEmail}</td>
+        <td><button class="btn btn-secondary btn-sm" onclick="viewAsTenant(${t.id})">Entrar como este negocio</button></td>
+      </tr>`).join("")}
+    </table>
+  </div>`;
+        }
+
+        function openTenantDrawer() {
+            openDrawer("Registrar nuevo negocio", `
+    <div class="field"><label>Nombre del negocio</label><input id="tnName" placeholder="Ej. Gimnasio Fuerza Total"></div>
+    <div class="field"><label>Nombre del dueño</label><input id="tnOwner" placeholder="Ej. Rosa Almonte"></div>
+    <div class="field"><label>Teléfono</label><input id="tnPhone" placeholder="809-555-0000"></div>
+    <div class="field"><label>Tipo de negocio</label>
+      <select id="tnModule">
+        <option value="gym">Gimnasio</option>
+        <option value="re">Agencia inmobiliaria</option>
+        <option value="rest">Restaurante</option>
+      </select>
+    </div>
+  `, `<button class="btn btn-secondary" onclick="closeDrawer()">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveTenant()">Registrar negocio</button>`);
+        }
+        function saveTenant() {
+            const name = document.getElementById("tnName").value || "Nuevo negocio";
+            const owner = document.getElementById("tnOwner").value || "Dueño";
+            const phone = document.getElementById("tnPhone").value || "809-000-0000";
+            const module = document.getElementById("tnModule").value;
+            const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, "").slice(0, 16) || "negocio";
+            const email = "dueno@" + slug + ".com";
+            const emojiMap = { gym: "🏋️", re: "🏠", rest: "🍽️" };
+            tenants.push({ id: nextId(), businessName: name, ownerName: owner, phone, module, loginEmail: email, emoji: emojiMap[module] });
+            closeDrawer();
+            showToast("Negocio registrado. Credenciales de acceso: " + email);
+            render();
+        }
+
+        function renderView() {
+            const v = state.view;
+            const map = {
+                demo_empty: renderEmptyDemo, demo_error: renderErrorDemo,
+                gym_dashboard: renderGymDashboard, gym_members: renderGymMembers, gym_member_detail: renderGymMemberDetail,
+                gym_plans: renderGymPlans, gym_checkout: renderGymCheckout, gym_receipt: renderGymReceipt,
+                gym_store: renderGymStore, gym_promotions: renderGymPromotions, gym_winback: renderGymWinback,
+                gym_automations: renderGymAutomations, gym_checkin: renderGymCheckin, gym_reports: renderGymReports,
+                re_dashboard: renderREDashboard, re_properties: renderREProperties, re_property_detail: renderREPropertyDetail,
+                re_leads: renderRELeads, re_lead_detail: renderRELeadDetail, re_dossier: renderREDossier, re_dossier_preview: renderREDossierPreview,
+                re_automations: renderREAutomations, re_reports: renderREReports,
+                rest_dashboard: renderRestDashboard, rest_map_edit: renderRestMapEdit, rest_map_live: renderRestMapLive,
+                rest_new_order: renderRestNewOrder, rest_order_confirm: renderRestOrderConfirm, rest_kitchen: renderRestKitchen, rest_history: renderRestHistory,
+            };
+            return (map[v] || (() => "<p>Pantalla no encontrada.</p>"))();
+        }
+
+        /* ============================= TRANSVERSAL ============================= */
+        function renderEmptyDemo() {
+            return `<div class="card empty-state">
+    <div class="big">📭</div>
+    <h3>Aún no tienes registros aquí</h3>
+    <p>Cuando agregues tu primer miembro, propiedad o mesa, aparecerá en esta pantalla.</p>
+    <button class="btn btn-primary" onclick="nav('${state.currentModule}_dashboard')">Volver al dashboard</button>
+  </div>`;
+        }
+        function renderErrorDemo() {
+            return `<div class="card error-state">
+    <div class="big">⚠️</div>
+    <h3>No pudimos cargar esta información</h3>
+    <p>Revisa tu conexión e inténtalo de nuevo.</p>
+    <button class="btn btn-primary" onclick="nav('${state.currentModule}_dashboard')">Reintentar</button>
+  </div>`;
+        }
+
+        /* ============================= GYM ============================= */
+        function renderGymDashboard() {
+            const activos = gymMembers.filter(m => m.status === "activo").length;
+            const vencidos = gymMembers.filter(m => m.status === "vencido").length;
+            const archivados = gymMembers.filter(m => m.status === "archivado").length;
+            return `
+  <h1 class="page-title">Dashboard</h1>
+  <div class="page-sub">Resumen general de PowerFit</div>
+  <div class="cards-row">
+    <div class="stat-card"><div class="label">Miembros activos</div><div class="value" style="color:var(--green)">${activos}</div></div>
+    <div class="stat-card"><div class="label">Vencidos</div><div class="value" style="color:var(--red)">${vencidos}</div></div>
+    <div class="stat-card"><div class="label">Archivados</div><div class="value" style="color:var(--text2)">${archivados}</div></div>
+    <div class="stat-card"><div class="label">Ingresos del mes</div><div class="value">${money(48300)}</div></div>
+  </div>
+  <div class="card">
+    <h3>Alertas de bajo stock</h3>
+    <table class="data"><tr><th>Producto</th><th>Stock</th></tr>
+    ${gymProducts.filter(p => p.stock <= p.low).map(p => `<tr><td>${p.name}</td><td>${pill(p.stock + " unidades", "red")}</td></tr>`).join("") || "<tr><td colspan=2>Sin alertas</td></tr>"}
+    </table>
+  </div>`;
+        }
+
+        function renderGymMembers() {
+            return `
+  <h1 class="page-title">Miembros</h1>
+  <div class="toolbar">
+    <div class="filters">
+      <select onchange="filterMembers(this.value)">
+        <option value="todos">Todos los estados</option>
+        <option value="activo">Activos</option>
+        <option value="vencido">Vencidos</option>
+        <option value="archivado">Archivados</option>
+      </select>
+    </div>
+    <button class="btn btn-primary" onclick="openNewMemberDrawer()">+ Nuevo miembro</button>
+  </div>
+  <div class="card" style="padding:0;">
+    <table class="data" id="membersTable">
+      <tr><th>Nombre</th><th>Teléfono</th><th>Plan</th><th>Vence</th><th>Estado</th></tr>
+      ${gymMembers.map(m => `
+        <tr class="clickable" onclick="showMemberDetail(${m.id})">
+          <td>${m.name}</td><td>${m.phone}</td><td>${m.plan}</td><td>${m.expires}</td><td>${statusPillGym(m.status)}</td>
+        </tr>`).join("")}
+    </table>
+  </div>`;
+        }
+        function filterMembers(val) {
+            const filtered = val === "todos" ? gymMembers : gymMembers.filter(m => m.status === val);
+            document.getElementById("membersTable").innerHTML = `
+    <tr><th>Nombre</th><th>Teléfono</th><th>Plan</th><th>Vence</th><th>Estado</th></tr>
+    ${filtered.map(m => `
+      <tr class="clickable" onclick="showMemberDetail(${m.id})">
+        <td>${m.name}</td><td>${m.phone}</td><td>${m.plan}</td><td>${m.expires}</td><td>${statusPillGym(m.status)}</td>
+      </tr>`).join("")}`;
+        }
+        function showMemberDetail(id) { state.selectedMemberId = id; nav("gym_member_detail"); }
+        function renderGymMemberDetail() {
+            const m = gymMembers.find(x => x.id === state.selectedMemberId);
+            if (!m) return renderEmptyDemo();
+            return `
+  <a class="back-link" onclick="nav('gym_members')">← Volver a miembros</a>
+  <h1 class="page-title">${m.name}</h1>
+  <div class="page-sub">${m.phone} · Miembro desde ${m.joined}</div>
+  <div class="grid-2">
+    <div class="card">
+      <h3>Estado de cuenta</h3>
+      <p>Plan actual: <b>${m.plan}</b></p>
+      <p>Vence: <b>${m.expires}</b></p>
+      <p>Estado: ${statusPillGym(m.status)}</p>
+      <button class="btn btn-primary btn-sm" onclick="reactivateMember(${m.id})">Reactivar / Renovar</button>
+    </div>
+    <div class="card">
+      <h3>Comunicación</h3>
+      <p style="font-size:13px;color:var(--text2)">El miembro puede optar por no recibir más mensajes.</p>
+      <label style="display:flex;align-items:center;gap:8px;font-size:13.5px;">
+        <input type="checkbox" ${m.optOut ? "checked" : ""} onchange="toggleOptOut(${m.id})"> No contactar por WhatsApp
+      </label>
+    </div>
+  </div>
+  <div class="card">
+    <h3>Historial de pagos</h3>
+    <table class="data"><tr><th>Fecha</th><th>Concepto</th><th>Monto</th><th>Método</th></tr>
+      <tr><td>${m.joined}</td><td>${m.plan}</td><td>${money(1800)}</td><td>Efectivo</td></tr>
+    </table>
+  </div>`;
+        }
+        function toggleOptOut(id) {
+            const m = gymMembers.find(x => x.id === id); m.optOut = !m.optOut;
+            showToast(m.optOut ? "Miembro marcado como 'No contactar'" : "Comunicación reactivada");
+            render();
+        }
+        function reactivateMember(id) {
+            const m = gymMembers.find(x => x.id === id); m.status = "activo";
+            showToast("Miembro reactivado");
+            render();
+        }
+        function openNewMemberDrawer() {
+            openDrawer("Nuevo miembro", `
+    <div class="field"><label>Nombre completo</label><input id="nmName" placeholder="Ej. Rosa Almonte"></div>
+    <div class="field"><label>Teléfono</label><input id="nmPhone" placeholder="809-555-0000"></div>
+    <div class="field"><label>Plan</label>
+      <select id="nmPlan">${gymPlans.map(p => `<option>${p.name}</option>`).join("")}</select>
+    </div>
+  `, `<button class="btn btn-secondary" onclick="closeDrawer()">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveNewMember()">Guardar miembro</button>`);
+        }
+        function saveNewMember() {
+            const name = document.getElementById("nmName").value || "Nuevo miembro";
+            const phone = document.getElementById("nmPhone").value || "809-000-0000";
+            const plan = document.getElementById("nmPlan").value;
+            gymMembers.unshift({ id: nextId(), name, phone, status: "activo", plan, expires: "2026-09-01", joined: "2026-08-03", optOut: false });
+            closeDrawer(); showToast("Miembro registrado con éxito"); nav("gym_members");
+        }
+
+        function renderGymPlans() {
+            return `
+  <h1 class="page-title">Planes y Tarifas</h1>
+  <div class="toolbar"><div></div><button class="btn btn-primary" onclick="openPlanDrawer()">+ Nuevo plan</button></div>
+  <div class="card" style="padding:0;">
+    <table class="data"><tr><th>Plan</th><th>Duración (días)</th><th>Precio</th></tr>
+      ${gymPlans.map(p => `<tr><td>${p.name}</td><td>${p.days}</td><td>${money(p.price)}</td></tr>`).join("")}
+    </table>
+  </div>`;
+        }
+        function openPlanDrawer() {
+            openDrawer("Nuevo plan", `
+    <div class="field"><label>Nombre del plan</label><input id="plName" placeholder="Ej. 4 meses"></div>
+    <div class="field"><label>Duración en días</label><input id="plDays" type="number" placeholder="120"></div>
+    <div class="field"><label>Precio</label><input id="plPrice" type="number" placeholder="6200"></div>
+  `, `<button class="btn btn-secondary" onclick="closeDrawer()">Cancelar</button>
+      <button class="btn btn-primary" onclick="savePlan()">Guardar plan</button>`);
+        }
+        function savePlan() {
+            const name = document.getElementById("plName").value || "Plan personalizado";
+            const days = document.getElementById("plDays").value || 30;
+            const price = document.getElementById("plPrice").value || 1000;
+            gymPlans.push({ id: nextId(), name, days, price });
+            closeDrawer(); showToast("Plan creado"); nav("gym_plans");
+        }
+
+        function renderGymCheckout() {
+            const cartTotal = state.cart.reduce((s, i) => s + i.price, 0);
+            return `
+  <h1 class="page-title">Registrar cobro</h1>
+  <div class="grid-2">
+    <div class="card">
+      <h3>1. Miembro y plan</h3>
+      <div class="field"><label>Miembro</label>
+        <select id="coMember">${gymMembers.map(m => `<option value="${m.id}">${m.name}</option>`).join("")}</select>
+      </div>
+      <div class="field"><label>Plan / Pase</label>
+        <select id="coPlan">${gymPlans.map(p => `<option value="${p.price}">${p.name} — ${money(p.price)}</option>`).join("")}</select>
+      </div>
+      <h3 style="margin-top:16px;">2. Agregar producto (opcional)</h3>
+      <div class="field"><label>Producto</label>
+        <select id="coProduct">${gymProducts.map(p => `<option value="${p.id}">${p.name} — ${money(p.price)}</option>`).join("")}</select>
+      </div>
+      <button class="btn btn-secondary btn-sm" onclick="addProductToCart()">+ Agregar a la venta</button>
+      <h3 style="margin-top:16px;">3. Método de pago</h3>
+      <div class="field">
+        <select id="coMethod"><option>Efectivo</option><option>Tarjeta física</option><option>Transferencia</option></select>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Resumen de venta</h3>
+      <table class="data">
+        <tr><th>Ítem</th><th>Monto</th></tr>
+        ${state.cart.map((c, i) => `<tr><td>${c.name}</td><td>${money(c.price)}</td></tr>`).join("") || "<tr><td colspan=2 style='color:var(--text2)'>Sin productos agregados</td></tr>"}
+      </table>
+      <p style="margin-top:14px;font-weight:700;">Total productos: ${money(cartTotal)}</p>
+      <button class="btn btn-primary btn-block" style="margin-top:10px;" onclick="confirmCharge()">Registrar cobro</button>
+    </div>
+  </div>`;
+        }
+        function addProductToCart() {
+            const pid = parseInt(document.getElementById("coProduct").value);
+            const p = gymProducts.find(x => x.id === pid);
+            state.cart.push({ name: p.name, price: p.price });
+            render();
+        }
+        function confirmCharge() {
+            state.cart = [];
+            nav("gym_receipt");
+            showToast("Comprobante enviado por WhatsApp");
+        }
+        function renderGymReceipt() {
+            return `
+  <h1 class="page-title">Cobro registrado ✅</h1>
+  <div class="doc-preview">
+    <div class="dp-header">
+      <div><b>PowerFit Gym</b><br><span style="font-size:12px;color:var(--text2)">RNC 130-00000-1</span></div>
+      <div style="text-align:right;font-size:12px;color:var(--text2)">Comprobante interno<br>03/08/2026</div>
+    </div>
+    <p>Miembro: <b>${gymMembers[0].name}</b></p>
+    <p>Plan: 1 mes — ${money(1800)}</p>
+    <p>Método de pago: Efectivo</p>
+    <p style="font-weight:700;font-size:16px;margin-top:16px;">Total: ${money(1800)}</p>
+    <p style="font-size:12px;color:var(--text2);margin-top:20px;">Comprobante enviado automáticamente por WhatsApp al miembro.</p>
+  </div>
+  <div style="text-align:center;margin-top:16px;"><button class="btn btn-primary" onclick="nav('gym_checkout')">Registrar otro cobro</button></div>`;
+        }
+
+        function renderGymStore() {
+            return `
+  <h1 class="page-title">Tienda e Inventario</h1>
+  <div class="toolbar"><div></div><button class="btn btn-primary" onclick="openProductDrawer()">+ Nuevo producto</button></div>
+  <div class="card" style="padding:0;">
+    <table class="data"><tr><th>Producto</th><th>Categoría</th><th>Precio</th><th>Costo</th><th>Ganancia</th><th>Stock</th></tr>
+      ${gymProducts.map(p => `<tr><td>${p.name}</td><td>${p.category}</td><td>${money(p.price)}</td><td>${money(p.cost)}</td><td style="color:var(--green)">${money(p.price - p.cost)}</td><td>${p.stock <= p.low ? pill(p.stock, "red") : p.stock}</td></tr>`).join("")}
+    </table>
+  </div>`;
+        }
+        function openProductDrawer() {
+            openDrawer("Nuevo producto", `
+    <div class="field"><label>Nombre</label><input id="pdName" placeholder="Ej. Barra de proteína"></div>
+    <div class="field"><label>Categoría</label><input id="pdCat" placeholder="Suplementos"></div>
+    <div class="field"><label>Precio de venta</label><input id="pdPrice" type="number" placeholder="300"></div>
+    <div class="field"><label>Costo de compra</label><input id="pdCost" type="number" placeholder="180"></div>
+    <div class="field"><label>Stock inicial</label><input id="pdStock" type="number" placeholder="20"></div>
+  `, `<button class="btn btn-secondary" onclick="closeDrawer()">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveProduct()">Guardar producto</button>`);
+        }
+        function saveProduct() {
+            gymProducts.push({
+                id: nextId(),
+                name: document.getElementById("pdName").value || "Producto nuevo",
+                category: document.getElementById("pdCat").value || "General",
+                price: Number(document.getElementById("pdPrice").value || 100),
+                cost: Number(document.getElementById("pdCost").value || 50),
+                stock: Number(document.getElementById("pdStock").value || 10),
+                low: 5
+            });
+            closeDrawer(); showToast("Producto agregado"); nav("gym_store");
+        }
+
+        function renderGymPromotions() {
+            return `
+  <h1 class="page-title">Promociones y Ofertas</h1>
+  <div class="toolbar"><div></div><button class="btn btn-primary" onclick="openPromoDrawer()">+ Nueva promoción</button></div>
+  <div class="card" style="padding:0;">
+    <table class="data"><tr><th>Nombre</th><th>Descuento</th><th>Vigencia</th><th>Planes</th></tr>
+      ${gymPromotions.map(p => `<tr><td>${p.name}</td><td>${p.discount}</td><td>${p.vigente}</td><td>${p.plans}</td></tr>`).join("")}
+    </table>
+  </div>`;
+        }
+        function openPromoDrawer() {
+            openDrawer("Nueva promoción", `
+    <div class="field"><label>Nombre de la oferta</label><input id="prName" placeholder="Ej. Día de la Madre"></div>
+    <div class="field"><label>Descuento</label><input id="prDisc" placeholder="20%"></div>
+    <div class="field"><label>Vigencia</label><input id="prVig" placeholder="01/08/2026 - 15/08/2026"></div>
+  `, `<button class="btn btn-secondary" onclick="closeDrawer()">Cancelar</button>
+      <button class="btn btn-primary" onclick="savePromo()">Crear y enviar por WhatsApp</button>`);
+        }
+        function savePromo() {
+            gymPromotions.push({ id: nextId(), name: document.getElementById("prName").value || "Nueva oferta", discount: document.getElementById("prDisc").value || "10%", vigente: document.getElementById("prVig").value || "—", plans: "Todos" });
+            closeDrawer(); showToast("Promoción creada y enviada por WhatsApp a todos los miembros"); nav("gym_promotions");
+        }
+
+        function renderGymWinback() {
+            return `
+  <h1 class="page-title">Reingreso de Archivados (Win-back)</h1>
+  <div class="card">
+    <h3>Mensaje de seguimiento</h3>
+    <div class="field"><label>Plantilla</label>
+      <textarea rows="4">Hola {nombre}, notamos que no te hemos visto en el gym. ¡Nos encantaría verte de vuelta! Tenemos una oferta especial para ti si regresas este mes.</textarea>
+    </div>
+    <div class="field"><label>Frecuencia de seguimiento</label>
+      <select><option>Cada 30 días</option><option>Cada 60 días</option><option>Cada 90 días</option></select>
+    </div>
+    <div class="field"><label>Descuento de reingreso</label><input value="20%"></div>
+    <button class="btn btn-primary" onclick="showToast('Configuración de reingreso guardada')">Guardar configuración</button>
+  </div>`;
+        }
+
+        function renderGymAutomations() {
+            return `
+  <h1 class="page-title">Automatizaciones</h1>
+  <div class="card">
+    <div class="field"><label>Recordatorio de vencimiento (días antes)</label><input type="number" value="3"></div>
+    <div class="field"><label>Días de inactividad para archivar</label><input type="number" value="45"></div>
+    <div class="field"><label>Días sin asistir para alerta de riesgo de fuga</label><input type="number" value="10"></div>
+    <label style="display:flex;align-items:center;gap:8px;font-size:13.5px;margin-bottom:10px;"><input type="checkbox" checked> Reporte semanal automático al dueño por WhatsApp</label>
+    <button class="btn btn-primary" onclick="showToast('Automatizaciones actualizadas')">Guardar</button>
+  </div>`;
+        }
+
+        function renderGymCheckin() {
+            return `
+  <h1 class="page-title">Check-in</h1>
+  <div class="card">
+    <div class="field"><label>Buscar miembro</label><input id="ciSearch" placeholder="Nombre del miembro..."></div>
+    <button class="btn btn-primary" onclick="doCheckin()">Registrar entrada</button>
+  </div>
+  <div class="card">
+    <h3>Entradas recientes</h3>
+    <table class="data"><tr><th>Miembro</th><th>Hora</th></tr>
+      ${checkins.map(c => `<tr><td>${c.name}</td><td>${c.time}</td></tr>`).join("") || "<tr><td colspan=2 style='color:var(--text2)'>Sin registros aún hoy</td></tr>"}
+    </table>
+  </div>`;
+        }
+        function doCheckin() {
+            const name = document.getElementById("ciSearch").value || "Miembro";
+            checkins.unshift({ name, time: "7:4" + Math.floor(Math.random() * 9) + " PM" });
+            showToast("Entrada registrada"); render();
+        }
+
+        function renderGymReports() {
+            return `
+  <h1 class="page-title">Reportes</h1>
+  <div class="cards-row">
+    <div class="stat-card"><div class="label">Ingresos membresías</div><div class="value">${money(38500)}</div></div>
+    <div class="stat-card"><div class="label">Ingresos tienda</div><div class="value">${money(9800)}</div></div>
+    <div class="stat-card"><div class="label">Ganancia neta tienda</div><div class="value" style="color:var(--green)">${money(5200)}</div></div>
+  </div>
+  <div class="card">
+    <h3>Historial de campañas</h3>
+    <table class="data"><tr><th>Campaña</th><th>Enviada</th></tr>
+      ${gymPromotions.map(p => `<tr><td>${p.name}</td><td>${p.vigente}</td></tr>`).join("")}
+    </table>
+  </div>`;
+        }
+
+        /* ============================= REAL ESTATE ============================= */
+        function renderREDashboard() {
+            const counts = stages.map(s => leads.filter(l => l.stage === s).length);
+            return `
+  <h1 class="page-title">Dashboard</h1>
+  <div class="page-sub">Resumen del pipeline de Nexo Inmuebles</div>
+  <div class="cards-row">
+    ${stages.map((s, i) => `<div class="stat-card"><div class="label">${s}</div><div class="value">${counts[i]}</div></div>`).join("")}
+  </div>
+  <div class="card">
+    <h3>Propiedades disponibles</h3>
+    <p style="font-size:24px;font-weight:800;">${properties.filter(p => p.status === "disponible").length}</p>
+  </div>`;
+        }
+        function renderREProperties() {
+            return `
+  <h1 class="page-title">Inventario de Propiedades</h1>
+  <div class="toolbar"><div></div><button class="btn btn-primary" onclick="openPropertyDrawer()">+ Nueva propiedad</button></div>
+  <div class="card" style="padding:0;">
+    <table class="data"><tr><th></th><th>Propiedad</th><th>Precio</th><th>Ubicación</th><th>Estado</th></tr>
+      ${properties.map(p => `<tr class="clickable" onclick="showPropertyDetail(${p.id})"><td style="font-size:20px;">${p.emoji}</td><td>${p.title}</td><td>${p.price}</td><td>${p.location}</td><td>${statusPillProp(p.status)}</td></tr>`).join("")}
+    </table>
+  </div>`;
+        }
+        function showPropertyDetail(id) { state.selectedPropertyId = id; nav("re_property_detail"); }
+        function renderREPropertyDetail() {
+            const p = properties.find(x => x.id === state.selectedPropertyId);
+            if (!p) return renderEmptyDemo();
+            return `
+  <a class="back-link" onclick="nav('re_properties')">← Volver a propiedades</a>
+  <h1 class="page-title">${p.emoji} ${p.title}</h1>
+  <div class="card">
+    <p>Precio: <b>${p.price}</b></p>
+    <p>Ubicación: <b>${p.location}</b></p>
+    <p>Estado: ${statusPillProp(p.status)}</p>
+  </div>
+  <div class="card">
+    <h3>Leads interesados en esta propiedad</h3>
+    <table class="data"><tr><th>Nombre</th><th>Etapa</th></tr>
+    ${leads.filter(l => l.propertyId === p.id).map(l => `<tr class="clickable" onclick="showLeadDetail(${l.id})"><td>${l.name}</td><td>${stagePill(l.stage)}</td></tr>`).join("") || "<tr><td colspan=2 style='color:var(--text2)'>Sin leads vinculados</td></tr>"}
+    </table>
+  </div>`;
+        }
+        function openPropertyDrawer() {
+            openDrawer("Nueva propiedad", `
+    <div class="field"><label>Título</label><input id="prTitle" placeholder="Ej. Penthouse Naco"></div>
+    <div class="field"><label>Precio</label><input id="prPrice" placeholder="US$ 210,000"></div>
+    <div class="field"><label>Ubicación</label><input id="prLoc" placeholder="Naco, Santo Domingo"></div>
+  `, `<button class="btn btn-secondary" onclick="closeDrawer()">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveProperty()">Guardar propiedad</button>`);
+        }
+        function saveProperty() {
+            properties.unshift({ id: nextId(), title: document.getElementById("prTitle").value || "Nueva propiedad", price: document.getElementById("prPrice").value || "—", location: document.getElementById("prLoc").value || "—", status: "disponible", emoji: "🏠" });
+            closeDrawer(); showToast("Propiedad agregada"); nav("re_properties");
+        }
+
+        function renderRELeads() {
+            return `
+  <h1 class="page-title">Pipeline de Leads</h1>
+  <div class="toolbar"><div></div><button class="btn btn-primary" onclick="openLeadDrawer()">+ Nuevo lead</button></div>
+  <div class="kanban">
+    ${stages.map(s => `
+      <div class="kcol">
+        <h4>${s} (${leads.filter(l => l.stage === s).length})</h4>
+        ${leads.filter(l => l.stage === s).map(l => `
+          <div class="kcard" onclick="showLeadDetail(${l.id})">
+            <div class="kname">${l.name}</div>
+            <div class="ksub">${l.source}</div>
+          </div>`).join("")}
+      </div>`).join("")}
+  </div>`;
+        }
+        function showLeadDetail(id) { state.selectedLeadId = id; nav("re_lead_detail"); }
+        function renderRELeadDetail() {
+            const l = leads.find(x => x.id === state.selectedLeadId);
+            if (!l) return renderEmptyDemo();
+            const prop = properties.find(p => p.id === l.propertyId);
+            return `
+  <a class="back-link" onclick="nav('re_leads')">← Volver al pipeline</a>
+  <h1 class="page-title">${l.name}</h1>
+  <div class="page-sub">${l.phone} · Origen: ${l.source}</div>
+  <div class="grid-2">
+    <div class="card">
+      <h3>Etapa actual</h3>
+      <select onchange="changeStage(${l.id}, this.value)">
+        ${stages.map(s => `<option ${s === l.stage ? "selected" : ""}>${s}</option>`).join("")}
+      </select>
+      <p style="margin-top:12px;">Propiedad de interés: <b>${prop ? prop.title : "—"}</b></p>
+      <p style="font-size:13px;color:var(--text2)">${l.notes}</p>
+    </div>
+    <div class="card">
+      <h3>Generar propuesta</h3>
+      <p style="font-size:13px;color:var(--text2)">Genera el dossier PDF con esta propiedad para enviarle a este lead.</p>
+      <button class="btn btn-primary" onclick="generateDossierFor(${l.id})">Generar dossier</button>
+    </div>
+  </div>`;
+        }
+        function changeStage(id, val) { leads.find(l => l.id === id).stage = val; showToast("Etapa actualizada"); render(); }
+        function openLeadDrawer() {
+            openDrawer("Nuevo lead", `
+    <div class="field"><label>Nombre</label><input id="ldName" placeholder="Ej. Sandra Peralta"></div>
+    <div class="field"><label>Teléfono</label><input id="ldPhone" placeholder="809-555-0000"></div>
+    <div class="field"><label>Origen</label>
+      <select id="ldSource"><option>Facebook</option><option>Instagram</option><option>Referido</option><option>Otro</option></select>
+    </div>
+    <div class="field"><label>Propiedad de interés</label>
+      <select id="ldProp">${properties.map(p => `<option value="${p.id}">${p.title}</option>`).join("")}</select>
+    </div>
+  `, `<button class="btn btn-secondary" onclick="closeDrawer()">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveLead()">Guardar lead</button>`);
+        }
+        function saveLead() {
+            leads.unshift({ id: nextId(), name: document.getElementById("ldName").value || "Nuevo lead", phone: document.getElementById("ldPhone").value || "809-000-0000", source: document.getElementById("ldSource").value, stage: "Nuevo", propertyId: Number(document.getElementById("ldProp").value), notes: "" });
+            closeDrawer(); showToast("Lead registrado"); nav("re_leads");
+        }
+
+        function generateDossierFor(leadId) {
+            state.selectedLeadId = leadId;
+            const l = leads.find(x => x.id === leadId);
+            state.selectedPropertyId = l.propertyId;
+            nav("re_dossier_preview");
+            showToast("Dossier generado y listo para enviar");
+        }
+        function renderREDossier() {
+            return `
+  <h1 class="page-title">Generar Propuesta</h1>
+  <div class="card">
+    <div class="field"><label>Lead</label>
+      <select id="dsLead">${leads.map(l => `<option value="${l.id}">${l.name}</option>`).join("")}</select>
+    </div>
+    <div class="field"><label>Propiedad</label>
+      <select id="dsProp">${properties.map(p => `<option value="${p.id}">${p.title}</option>`).join("")}</select>
+    </div>
+    <button class="btn btn-primary" onclick="genFromForm()">Generar dossier</button>
+  </div>`;
+        }
+        function genFromForm() {
+            state.selectedLeadId = Number(document.getElementById("dsLead").value);
+            state.selectedPropertyId = Number(document.getElementById("dsProp").value);
+            nav("re_dossier_preview");
+        }
+        function renderREDossierPreview() {
+            const l = leads.find(x => x.id === state.selectedLeadId) || leads[0];
+            const p = properties.find(x => x.id === state.selectedPropertyId) || properties[0];
+            return `
+  <a class="back-link" onclick="nav('re_leads')">← Volver</a>
+  <h1 class="page-title">Vista previa del Dossier</h1>
+  <div class="doc-preview">
+    <div class="dp-header">
+      <div><b>Nexo Inmuebles</b><br><span style="font-size:12px;color:var(--text2)">Propuesta comercial</span></div>
+      <div style="text-align:right;font-size:12px;color:var(--text2)">03/08/2026</div>
+    </div>
+    <p>Preparado para: <b>${l.name}</b></p>
+    <h3 style="margin-top:16px;">${p.emoji} ${p.title}</h3>
+    <p>Precio: <b>${p.price}</b></p>
+    <p>Ubicación: ${p.location}</p>
+    <p style="margin-top:16px;font-size:13px;color:var(--text2)">Documento generado automáticamente a partir del lead y la propiedad seleccionada.</p>
+  </div>
+  <div style="text-align:center;margin-top:16px;"><button class="btn btn-primary" onclick="showToast('Dossier enviado por WhatsApp')">Enviar por WhatsApp</button></div>`;
+        }
+
+        function renderREAutomations() {
+            return `
+  <h1 class="page-title">Automatizaciones</h1>
+  <div class="card">
+    <div class="field"><label>Días sin seguimiento para alertar al agente</label><input type="number" value="3"></div>
+    <label style="display:flex;align-items:center;gap:8px;font-size:13.5px;margin-bottom:10px;"><input type="checkbox" checked> Enviar recordatorio automático por WhatsApp directo al lead</label>
+    <button class="btn btn-primary" onclick="showToast('Automatizaciones actualizadas')">Guardar</button>
+  </div>`;
+        }
+        function renderREReports() {
+            const bySource = {};
+            leads.forEach(l => { bySource[l.source] = (bySource[l.source] || 0) + 1; });
+            return `
+  <h1 class="page-title">Reportes</h1>
+  <div class="card">
+    <h3>Leads por fuente</h3>
+    <table class="data"><tr><th>Fuente</th><th>Cantidad</th></tr>
+      ${Object.keys(bySource).map(k => `<tr><td>${k}</td><td>${bySource[k]}</td></tr>`).join("")}
+    </table>
+  </div>
+  <div class="card">
+    <h3>Propiedades más consultadas</h3>
+    <table class="data"><tr><th>Propiedad</th><th>Leads vinculados</th></tr>
+      ${properties.map(p => `<tr><td>${p.title}</td><td>${leads.filter(l => l.propertyId === p.id).length}</td></tr>`).join("")}
+    </table>
+  </div>`;
+        }
+
+        /* ============================= RESTAURANT ============================= */
+        function currentFloor() { return floors[state.selectedFloor]; }
+        function renderRestDashboard() {
+            const allTables = floors.flatMap(f => f.tables);
+            const libres = allTables.filter(t => t.status === "libre").length;
+            const ocupadas = allTables.filter(t => t.status === "ocupada").length;
+            const cuentas = allTables.filter(t => t.status === "cuenta").length;
+            return `
+  <h1 class="page-title">Dashboard</h1>
+  <div class="page-sub">Vista general del salón — El Fogón</div>
+  <div class="cards-row">
+    <div class="stat-card"><div class="label">Mesas libres</div><div class="value" style="color:var(--green)">${libres}</div></div>
+    <div class="stat-card"><div class="label">Ocupadas</div><div class="value" style="color:var(--red)">${ocupadas}</div></div>
+    <div class="stat-card"><div class="label">Cuenta pedida</div><div class="value" style="color:#8a6d00">${cuentas}</div></div>
+    <div class="stat-card"><div class="label">Pedidos en cocina</div><div class="value">${orders.length}</div></div>
+  </div>`;
+        }
+        function switchFloor(i) { state.selectedFloor = i; render(); }
+        function renderFloorTabs() {
+            return `<div class="floor-tabs">
+    ${floors.map((f, i) => `<button class="${state.selectedFloor === i ? 'active' : ''}" onclick="switchFloor(${i})">Nivel ${f.level}</button>`).join("")}
+    <button onclick="addFloor()">+ Agregar nivel</button>
+  </div>`;
+        }
+        function addFloor() { floors.push({ level: floors.length + 1, tables: [] }); showToast("Nivel agregado"); render(); }
+
+        function renderRestMapEdit() {
+            const f = currentFloor();
+            let cells = "";
+            for (let r = 0; r < 4; r++) {
+                for (let c = 0; c < 10; c++) {
+                    const t = f.tables.find(tb => tb.row === r && tb.col === c);
+                    if (t) { cells += `<div class="map-cell table libre" onclick="removeTable(${t.id})">M${t.id}</div>`; }
+                    else { cells += `<div class="map-cell" onclick="addTable(${r},${c})">+</div>`; }
+                }
+            }
+            return `
+  <h1 class="page-title">Editor de Mapa de Mesas</h1>
+  <div class="page-sub">Haz clic en una celda vacía para agregar una mesa, o en una mesa para quitarla.</div>
+  ${renderFloorTabs()}
+  <div class="map-grid">${cells}</div>`;
+        }
+        function addTable(r, c) {
+            currentFloor().tables.push({ id: nextId(), row: r, col: c, status: "libre" });
+            render();
+        }
+        function removeTable(id) {
+            const f = currentFloor(); f.tables = f.tables.filter(t => t.id !== id);
+            render();
+        }
+
+        function renderRestMapLive() {
+            const f = currentFloor();
+            let cells = "";
+            for (let r = 0; r < 4; r++) {
+                for (let c = 0; c < 10; c++) {
+                    const t = f.tables.find(tb => tb.row === r && tb.col === c);
+                    if (t) { cells += `<div class="map-cell table ${t.status}" onclick="cycleStatus(${t.id})">M${t.id}</div>`; }
+                    else { cells += `<div class="map-cell"></div>`; }
+                }
+            }
+            return `
+  <h1 class="page-title">Mapa de Mesas — En vivo</h1>
+  ${renderFloorTabs()}
+  <div class="map-grid">${cells}</div>
+  <div class="legend">
+    <span><i style="background:var(--green)"></i> Libre</span>
+    <span><i style="background:var(--red)"></i> Ocupada</span>
+    <span><i style="background:var(--amber)"></i> Cuenta pedida</span>
+  </div>
+  <p style="font-size:12.5px;color:var(--text2);margin-top:10px;">Haz clic en una mesa para cambiar su estado.</p>`;
+        }
+        function cycleStatus(id) {
+            const order = ["libre", "ocupada", "cuenta"];
+            for (const f of floors) {
+                const t = f.tables.find(x => x.id === id);
+                if (t) { t.status = order[(order.indexOf(t.status) + 1) % order.length]; }
+            }
+            render();
+        }
+
+        function renderRestNewOrder() {
+            const cartTotal = state.cart.reduce((s, i) => s + i.price, 0);
+            const allTables = floors.flatMap(f => f.tables);
+            return `
+  <h1 class="page-title">Nuevo Pedido</h1>
+  <div class="grid-2">
+    <div class="card">
+      <div class="field"><label>Mesa</label>
+        <select id="orTable">${allTables.map(t => `<option value="${t.id}">Mesa ${t.id}</option>`).join("")}</select>
+      </div>
+      <h3>Menú</h3>
+      <table class="data"><tr><th>Plato</th><th>Precio</th><th></th></tr>
+      ${menu.map(m => `<tr><td>${m.name}</td><td>${money(m.price)}</td><td><button class="btn btn-secondary btn-sm" onclick="addMenuItem(${m.id})">Agregar</button></td></tr>`).join("")}
+      </table>
+    </div>
+    <div class="card">
+      <h3>Ticket</h3>
+      <table class="data">${state.cart.map(c => `<tr><td>${c.name}</td><td>${money(c.price)}</td></tr>`).join("") || "<tr><td style='color:var(--text2)'>Sin platos agregados</td></tr>"}</table>
+      <p style="font-weight:700;margin-top:10px;">Total: ${money(cartTotal)}</p>
+      <button class="btn btn-primary btn-block" onclick="sendToKitchen()">Enviar a cocina</button>
+    </div>
+  </div>`;
+        }
+        function addMenuItem(id) {
+            const m = menu.find(x => x.id === id);
+            state.cart.push({ name: m.name, price: m.price });
+            render();
+        }
+        function sendToKitchen() {
+            const tableId = document.getElementById("orTable").value;
+            orders.push({ id: nextId(), tableId, items: [...state.cart], time: "7:5" + Math.floor(Math.random() * 9) + " PM" });
+            state.cart = [];
+            nav("rest_order_confirm");
+        }
+        function renderRestOrderConfirm() {
+            return `
+  <h1 class="page-title">Pedido enviado a cocina ✅</h1>
+  <div class="card"><p>El pedido fue registrado y ya está visible en la vista de Cocina.</p></div>
+  <button class="btn btn-primary" onclick="nav('rest_new_order')">Registrar otro pedido</button>
+  <button class="btn btn-secondary" onclick="nav('rest_kitchen')" style="margin-left:8px;">Ir a Cocina</button>`;
+        }
+
+        function renderRestKitchen() {
+            return `
+  <h1 class="page-title">Cocina</h1>
+  <div class="card" style="padding:0;">
+    <table class="data"><tr><th>Mesa</th><th>Platos</th><th>Hora</th><th></th></tr>
+      ${orders.map(o => `<tr><td>Mesa ${o.tableId}</td><td>${o.items.map(i => i.name).join(", ")}</td><td>${o.time}</td><td><button class="btn btn-primary btn-sm" onclick="markReady(${o.id})">Marcar listo</button></td></tr>`).join("") || "<tr><td colspan=4 style='color:var(--text2)'>Sin pedidos pendientes</td></tr>"}
+    </table>
+  </div>`;
+        }
+        function markReady(id) {
+            const o = orders.find(x => x.id === id);
+            orderHistory.unshift(o);
+            orders = orders.filter(x => x.id !== id);
+            showToast("Pedido marcado como listo");
+            render();
+        }
+        function renderRestHistory() {
+            return `
+  <h1 class="page-title">Historial de Pedidos</h1>
+  <div class="card" style="padding:0;">
+    <table class="data"><tr><th>Mesa</th><th>Platos</th><th>Hora</th></tr>
+      ${orderHistory.map(o => `<tr><td>Mesa ${o.tableId}</td><td>${o.items.map(i => i.name).join(", ")}</td><td>${o.time}</td></tr>`).join("") || "<tr><td colspan=3 style='color:var(--text2)'>Sin pedidos completados aún</td></tr>"}
+    </table>
+  </div>`;
+        }
+
+        /* ============================= INIT ============================= */
+        render();
+    </script>
+</body>
+
+</html>

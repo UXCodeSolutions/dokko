@@ -1,0 +1,129 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/theme/dokko_tokens.dart';
+import '../../../core/widgets/dokko_card.dart';
+import '../../../core/providers/tenant_provider.dart';
+import '../providers/gym_provider.dart';
+
+class GymDashboardScreen extends ConsumerWidget {
+  const GymDashboardScreen({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final kpisAsync = ref.watch(gymKpisProvider);
+    final tenant = ref.watch(tenantProvider).value;
+    
+    final primaryColor = tenant?.accentColor ?? DokkoTokens.accentDefault;
+
+    return Scaffold(
+      backgroundColor: DokkoTokens.bg,
+      body: Padding(
+        padding: const EdgeInsets.all(DokkoTokens.space24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Text(
+              'Dashboard Gym',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.w600,
+                color: DokkoTokens.text,
+              ),
+            ),
+            const SizedBox(height: DokkoTokens.space24),
+            kpisAsync.when(
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (err, _) => Text('Error: $err', style: const TextStyle(color: Colors.red)),
+              data: (kpis) {
+                return Row(
+                  children: [
+                    _KpiCard(
+                      title: 'Miembros Activos',
+                      value: '${kpis['active_members_count']}',
+                      icon: Icons.people_rounded,
+                      color: primaryColor,
+                    ),
+                    const SizedBox(width: DokkoTokens.space16),
+                    _KpiCard(
+                      title: 'Ingresos del Mes',
+                      value: '\$${kpis['monthly_revenue']}',
+                      icon: Icons.attach_money_rounded,
+                      color: DokkoTokens.green,
+                    ),
+                    const SizedBox(width: DokkoTokens.space16),
+                    _KpiCard(
+                      title: 'Vencimientos a 7 Días',
+                      value: '${kpis['upcoming_expirations_count']}',
+                      icon: Icons.warning_rounded,
+                      color: DokkoTokens.amber,
+                    ),
+                    const SizedBox(width: DokkoTokens.space16),
+                    _KpiCard(
+                      title: 'Check-ins Hoy',
+                      value: '${kpis['checkins_today']}',
+                      icon: Icons.qr_code_scanner_rounded,
+                      color: primaryColor,
+                    ),
+                  ],
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _KpiCard extends StatelessWidget {
+  final String title;
+  final String value;
+  final IconData icon;
+  final Color color;
+
+  const _KpiCard({
+    required this.title,
+    required this.value,
+    required this.icon,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: DokkoCard(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(icon, size: 24, color: color),
+                const SizedBox(width: DokkoTokens.space8),
+                Expanded(
+                  child: Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      color: DokkoTokens.text2,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: DokkoTokens.space16),
+            Text(
+              value,
+              style: const TextStyle(
+                fontSize: 28,
+                fontWeight: FontWeight.w700,
+                color: DokkoTokens.text,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
