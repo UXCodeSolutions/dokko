@@ -132,13 +132,35 @@ def list_tenants(user: dict = Depends(_require_super_admin)):
 def get_tenant(tenant_id: str, user: dict = Depends(_require_super_admin)):
     """Detalle de un tenant (solo super-admin)."""
     res = supabase_admin.table("tenants")\
-        .select("*, account_owners(email)")\
+        .select("*, account_owners(email), tenant_users(*)")\
         .eq("id", tenant_id)\
         .maybe_single()\
         .execute()
     if res is None or not res.data:
         raise HTTPException(status_code=404, detail="Tenant no encontrado.")
     return res.data
+
+
+@router.patch("/tenants/{tenant_id}")
+def update_tenant_details(
+    tenant_id: str,
+    body: dict,
+    user: dict = Depends(_require_super_admin),
+):
+    """Actualiza datos básicos del tenant (nombre, días de retención)."""
+    allowed_fields = {"name", "retention_days", "status"}
+    payload = {k: v for k, v in body.items() if k in allowed_fields}
+    if not payload:
+        raise HTTPException(status_code=400, detail="Sin campos válidos para actualizar.")
+
+    res = supabase_admin.table("tenants")\
+        .update(payload)\
+        .eq("id", tenant_id)\
+        .execute()
+
+    if not res.data:
+        raise HTTPException(status_code=404, detail="Tenant no encontrado.")
+    return res.data[0]
 
 
 @router.patch("/tenants/{tenant_id}/status")
