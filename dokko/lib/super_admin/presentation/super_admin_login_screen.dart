@@ -68,7 +68,7 @@ class _SuperAdminLoginScreenState extends ConsumerState<SuperAdminLoginScreen> {
                   // Logotipo grande de Dokko
                   Image.asset(
                     'assets/images/dokkologos/dokkoLogoClaro.png',
-                    height: 52,
+                    height: 64,
                     fit: BoxFit.contain,
                   ),
                   const SizedBox(height: DokkoTokens.space24),

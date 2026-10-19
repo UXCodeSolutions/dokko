@@ -25,7 +25,7 @@ class SuperAdminShell extends ConsumerWidget {
               centerTitle: true,
               title: Image.asset(
                 'assets/images/dokkologos/dokkoLogoClaro.png',
-                height: 28,
+                height: 36,
                 fit: BoxFit.contain,
               ),
               leading: Builder(
@@ -69,7 +69,7 @@ class _SuperAdminSidebar extends ConsumerWidget {
     final currentLocation = GoRouterState.of(context).uri.toString();
 
     return Container(
-      width: isDrawer ? double.infinity : 220,
+      width: isDrawer ? double.infinity : 240,
       decoration: BoxDecoration(
         color: DokkoTokens.surface,
         border: isDrawer
@@ -82,7 +82,7 @@ class _SuperAdminSidebar extends ConsumerWidget {
           // Header — logotipo completo de Dokko
           Container(
             padding: const EdgeInsets.symmetric(
-              horizontal: DokkoTokens.space16,
+              horizontal: DokkoTokens.space20,
               vertical: DokkoTokens.space20,
             ),
             decoration: const BoxDecoration(
@@ -90,7 +90,7 @@ class _SuperAdminSidebar extends ConsumerWidget {
             ),
             child: Image.asset(
               'assets/images/dokkologos/dokkoLogoClaro.png',
-              height: 36,
+              height: 48,
               fit: BoxFit.contain,
               alignment: Alignment.centerLeft,
             ),
