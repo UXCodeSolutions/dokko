@@ -1,0 +1,19 @@
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Python
+dokko-backend/venv/
+**/__pycache__/
+*.pyc
+
+# Flutter
+dokko/.dart_tool/
+dokko/build/
+dokko/.flutter-plugins
+dokko/.flutter-plugins-dependencies
+
+# OS
+.DS_Store
+Thumbs.db
