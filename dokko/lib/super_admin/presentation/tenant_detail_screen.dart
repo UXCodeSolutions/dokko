@@ -14,6 +14,7 @@ import '../../../core/widgets/dokko_button.dart';
 import '../../../core/widgets/dokko_card.dart';
 import '../../../core/widgets/dokko_input.dart';
 import '../providers/super_admin_provider.dart';
+import '../widgets/delete_tenant_dialog.dart';
 
 class TenantDetailScreen extends ConsumerStatefulWidget {
   final String tenantId;
@@ -328,6 +329,21 @@ class _TenantDetailScreenState extends ConsumerState<TenantDetailScreen>
     );
   }
 
+  void _showDeleteTenantDialog() {
+    if (_tenant == null) return;
+    final name = _tenant!['name']?.toString() ?? 'Empresa';
+    DeleteTenantDialog.show(
+      context,
+      tenantId: widget.tenantId,
+      tenantName: name,
+      onDeleted: () async {
+        if (mounted) {
+          context.go('/super-admin/tenants');
+        }
+      },
+    );
+  }
+
   Color _parseHex(String? raw, {Color fallback = DokkoTokens.accentDefault}) {
     if (raw == null || raw.isEmpty) return fallback;
     final cleaned = raw.replaceAll('#', '');
@@ -502,6 +518,12 @@ class _TenantDetailScreenState extends ConsumerState<TenantDetailScreen>
               icon: const Icon(Icons.refresh_rounded,
                   color: DokkoTokens.text2, size: 20),
               onPressed: _fetchTenant,
+            ),
+            const SizedBox(width: DokkoTokens.space8),
+            DokkoButton(
+              label: 'Eliminar tenant',
+              variant: DokkoButtonVariant.danger,
+              onPressed: _showDeleteTenantDialog,
             ),
             const SizedBox(width: DokkoTokens.space8),
             DokkoButton(
@@ -806,6 +828,11 @@ class _TenantDetailScreenState extends ConsumerState<TenantDetailScreen>
                       onPressed: () => _changeStatus('active'),
                     ),
                   ],
+                  DokkoButton(
+                    label: 'Eliminar Empresa Definitivamente',
+                    variant: DokkoButtonVariant.danger,
+                    onPressed: _showDeleteTenantDialog,
+                  ),
                 ],
               ),
             ],

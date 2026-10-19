@@ -184,6 +184,31 @@ def update_tenant_status(
     return res.data[0]
 
 
+@router.delete("/tenants/{tenant_id}")
+def delete_tenant(tenant_id: str, user: dict = Depends(_require_super_admin)):
+    """Elimina permanentemente un tenant, sus usuarios y datos asociados (solo super-admin)."""
+    # 1. Obtener los usuarios Auth vinculados en tenant_users para eliminarlos
+    try:
+        users_res = supabase_admin.table("tenant_users").select("user_id").eq("tenant_id", tenant_id).execute()
+        if users_res.data:
+            for item in users_res.data:
+                uid = item.get("user_id")
+                if uid:
+                    try:
+                        supabase_admin.auth.admin.delete_user(uid)
+                    except Exception:
+                        pass
+    except Exception:
+        pass
+
+    # 2. Eliminar el tenant de la base de datos (tablas dependientes tienen ON DELETE CASCADE)
+    res = supabase_admin.table("tenants").delete().eq("id", tenant_id).execute()
+    if not res.data:
+        raise HTTPException(status_code=404, detail="Tenant no encontrado o ya eliminado.")
+
+    return {"message": "Tenant eliminado exitosamente", "id": tenant_id}
+
+
 # ═══════════════════════════════════════════════════════
 # FASE 23 — Branding (extracción y validación de contraste)
 # ═══════════════════════════════════════════════════════

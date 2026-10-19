@@ -6,6 +6,7 @@ import '../../../core/api/api_provider.dart';
 import '../../../core/theme/dokko_tokens.dart';
 import '../../../core/widgets/dokko_button.dart';
 import '../../../core/widgets/dokko_empty_state.dart';
+import '../widgets/delete_tenant_dialog.dart';
 
 class TenantsListScreen extends ConsumerStatefulWidget {
   const TenantsListScreen({super.key});
@@ -52,6 +53,19 @@ class _TenantsListScreenState extends ConsumerState<TenantsListScreen> {
         _isLoading = false;
       });
     }
+  }
+
+  void _confirmDeleteTenant(Map<String, dynamic> tenant) {
+    final id = tenant['id']?.toString() ?? '';
+    final name = tenant['name']?.toString() ?? 'Empresa';
+    DeleteTenantDialog.show(
+      context,
+      tenantId: id,
+      tenantName: name,
+      onDeleted: () async {
+        await _fetchTenants();
+      },
+    );
   }
 
   @override
@@ -129,6 +143,7 @@ class _TenantsListScreenState extends ConsumerState<TenantsListScreen> {
                             tenant: tenant,
                             onTap: () =>
                                 context.go('/super-admin/tenants/$id'),
+                            onDelete: () => _confirmDeleteTenant(tenant),
                           );
                         },
                       ),
@@ -144,8 +159,14 @@ class _TenantsListScreenState extends ConsumerState<TenantsListScreen> {
 class TenantCard extends StatefulWidget {
   final Map<String, dynamic> tenant;
   final VoidCallback onTap;
+  final VoidCallback? onDelete;
 
-  const TenantCard({super.key, required this.tenant, required this.onTap});
+  const TenantCard({
+    super.key,
+    required this.tenant,
+    required this.onTap,
+    this.onDelete,
+  });
 
   @override
   State<TenantCard> createState() => _TenantCardState();
@@ -224,11 +245,35 @@ class _TenantCardState extends State<TenantCard> {
                             ),
                           ),
                           const SizedBox(width: DokkoTokens.space8),
-                          Icon(
-                            Icons.chevron_right_rounded,
-                            size: 18,
-                            color: _hovered ? color : DokkoTokens.text3,
-                          ),
+                          if (_hovered && widget.onDelete != null)
+                            Tooltip(
+                              message: 'Eliminar tenant',
+                              child: InkWell(
+                                onTap: widget.onDelete,
+                                borderRadius: BorderRadius.circular(DokkoTokens.radiusSm),
+                                child: Container(
+                                  padding: const EdgeInsets.all(5),
+                                  decoration: BoxDecoration(
+                                    color: DokkoTokens.red.withValues(alpha: 0.15),
+                                    borderRadius: BorderRadius.circular(DokkoTokens.radiusSm),
+                                    border: Border.all(
+                                      color: DokkoTokens.red.withValues(alpha: 0.3),
+                                    ),
+                                  ),
+                                  child: const Icon(
+                                    Icons.delete_outline_rounded,
+                                    size: 16,
+                                    color: DokkoTokens.red,
+                                  ),
+                                ),
+                              ),
+                            )
+                          else
+                            Icon(
+                              Icons.chevron_right_rounded,
+                              size: 18,
+                              color: _hovered ? color : DokkoTokens.text3,
+                            ),
                         ],
                       ),
                       const Spacer(),
