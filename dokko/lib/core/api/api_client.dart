@@ -12,14 +12,14 @@ class DokkoApiClient {
   Future<Map<String, String>> _getHeaders() async {
     final session = Supabase.instance.client.auth.currentSession;
     final token = session?.accessToken;
-    final bearer = token == null ? null : 'Bearer $token';
 
-    return {
+    final headers = <String, String>{
       'Content-Type': 'application/json',
       'Accept': 'application/json',
-      'Authorization': ?bearer,
-      'X-Support-Tenant-Id': ?supportTenantId,
     };
+    if (token != null) headers['Authorization'] = 'Bearer $token';
+    if (supportTenantId != null) headers['X-Support-Tenant-Id'] = supportTenantId!;
+    return headers;
   }
 
   Future<dynamic> get(String path) async {
