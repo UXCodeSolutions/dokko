@@ -655,14 +655,28 @@ class _TenantDetailScreenState extends ConsumerState<TenantDetailScreen>
         // Cuadrícula de 4 Métricas Clave
         LayoutBuilder(
           builder: (context, constraints) {
-            final isNarrow = constraints.maxWidth < 650;
+            final width = constraints.maxWidth;
+            final int crossAxisCount;
+            final double childAspectRatio;
+
+            if (width < 540) {
+              crossAxisCount = 2;
+              childAspectRatio = 1.65;
+            } else if (width < 860) {
+              crossAxisCount = 2;
+              childAspectRatio = 2.2;
+            } else {
+              crossAxisCount = 4;
+              childAspectRatio = 2.0;
+            }
+
             return GridView.count(
-              crossAxisCount: isNarrow ? 2 : 4,
+              crossAxisCount: crossAxisCount,
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               crossAxisSpacing: DokkoTokens.space12,
               mainAxisSpacing: DokkoTokens.space12,
-              childAspectRatio: isNarrow ? 1.5 : 1.7,
+              childAspectRatio: childAspectRatio,
               children: [
                 _buildMetricCard(
                   title: 'Módulo Operativo',
@@ -1092,20 +1106,25 @@ class _TenantDetailScreenState extends ConsumerState<TenantDetailScreen>
     required Color color,
   }) {
     return DokkoCard(
+      padding: const EdgeInsets.symmetric(
+        horizontal: DokkoTokens.space16,
+        vertical: DokkoTokens.space12,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
         children: [
           Row(
             children: [
-              Icon(icon, size: 18, color: color),
+              Icon(icon, size: 16, color: color),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
                   title,
                   style: const TextStyle(
                       color: DokkoTokens.text3,
-                      fontSize: 12.5,
+                      fontSize: 12.0,
                       fontWeight: FontWeight.w500),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -1113,15 +1132,18 @@ class _TenantDetailScreenState extends ConsumerState<TenantDetailScreen>
               ),
             ],
           ),
-          const SizedBox(height: 8),
-          Text(
-            value,
-            style: const TextStyle(
-                color: DokkoTokens.text,
-                fontSize: 17,
-                fontWeight: FontWeight.w700),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
+          const SizedBox(height: 6),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Text(
+              value,
+              style: const TextStyle(
+                  color: DokkoTokens.text,
+                  fontSize: 17,
+                  fontWeight: FontWeight.w700),
+              maxLines: 1,
+            ),
           ),
         ],
       ),
