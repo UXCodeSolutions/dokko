@@ -40,7 +40,7 @@ class _SuperAdminSidebar extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Header
+          // Header — logotipo completo de Dokko
           Container(
             padding: const EdgeInsets.symmetric(
               horizontal: DokkoTokens.space16,
@@ -49,26 +49,14 @@ class _SuperAdminSidebar extends ConsumerWidget {
             decoration: const BoxDecoration(
               border: Border(bottom: BorderSide(color: DokkoTokens.line)),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Image.asset('assets/images/dokkologos/DokkoIsoClaro.png', height: 24),
-                    const SizedBox(width: 8),
-                    const Text(
-                      'Super-Admin',
-                      style: TextStyle(
-                        color: DokkoTokens.amber,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+            child: Image.asset(
+              'assets/images/dokkologos/dokkoLogoClaro.png',
+              height: 36,
+              fit: BoxFit.contain,
+              alignment: Alignment.centerLeft,
             ),
           ),
+
           // Nav Items
           Expanded(
             child: ListView(
@@ -76,13 +64,13 @@ class _SuperAdminSidebar extends ConsumerWidget {
               children: [
                 _NavItem(
                   icon: Icons.business_rounded,
-                  label: 'Tenants',
+                  label: 'Clientes',
                   path: '/super-admin/tenants',
                   isActive: currentLocation.startsWith('/super-admin/tenants'),
                 ),
                 _NavItem(
                   icon: Icons.manage_accounts_rounded,
-                  label: 'Account Owners',
+                  label: 'Propietarios',
                   path: '/super-admin/owners',
                   isActive: currentLocation.startsWith('/super-admin/owners'),
                 ),

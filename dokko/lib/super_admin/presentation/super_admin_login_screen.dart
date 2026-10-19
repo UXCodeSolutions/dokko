@@ -59,6 +59,13 @@ class _SuperAdminLoginScreenState extends ConsumerState<SuperAdminLoginScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              // Logotipo grande de Dokko
+              Image.asset(
+                'assets/images/dokkologos/dokkoLogoClaro.png',
+                height: 52,
+                fit: BoxFit.contain,
+              ),
+              const SizedBox(height: DokkoTokens.space24),
               // Badge identificador
               Container(
                 margin: const EdgeInsets.only(bottom: DokkoTokens.space24),

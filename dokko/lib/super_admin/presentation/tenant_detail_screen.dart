@@ -202,11 +202,11 @@ class _TenantDetailScreenState extends ConsumerState<TenantDetailScreen> {
                       _InfoRow(label: 'Nombre', value: _tenant!['name']),
                       _InfoRow(label: 'Módulo', value: _tenant!['module_slug']),
                       _InfoRow(
-                        label: 'Account Owner',
+                        label: 'Propietario',
                         value: _tenant!['account_owners']?['email'] ?? 'Sin asignar',
                       ),
                       _InfoRow(
-                        label: 'Email Owner',
+                        label: 'Email propietario',
                         value: _tenant!['account_owners']?['email'] ?? '—',
                       ),
                     ],

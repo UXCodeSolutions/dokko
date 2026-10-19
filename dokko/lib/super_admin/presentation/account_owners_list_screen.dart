@@ -48,7 +48,7 @@ class _AccountOwnersListScreenState
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           const Text(
-            'Account Owners',
+            'Propietarios de cuenta',
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.w600,
@@ -64,7 +64,7 @@ class _AccountOwnersListScreenState
                   : _owners.isEmpty
                       ? const DokkoEmptyState(
                           icon: Icons.manage_accounts_rounded,
-                          message: 'No hay Account Owners registrados.',
+                          message: 'No hay propietarios de cuenta registrados.',
                         )
                       : DokkoTable<Map<String, dynamic>>(
                           columns: const [

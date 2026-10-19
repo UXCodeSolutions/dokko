@@ -65,7 +65,7 @@ class _TenantsListScreenState extends ConsumerState<TenantsListScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const Text(
-                'Tenants',
+                'Clientes',
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.w600,
@@ -73,7 +73,7 @@ class _TenantsListScreenState extends ConsumerState<TenantsListScreen> {
                 ),
               ),
               DokkoButton(
-                label: 'Nuevo Tenant',
+                label: 'Nuevo Cliente',
                 onPressed: () => context.go('/super-admin/tenants/new'),
               ),
             ],
@@ -110,7 +110,7 @@ class _TenantsListScreenState extends ConsumerState<TenantsListScreen> {
                     : _tenants.isEmpty
                         ? const DokkoEmptyState(
                             icon: Icons.business_rounded,
-                            message: 'No hay tenants registrados.',
+                            message: 'No hay clientes registrados.',
                           )
                         : GridView.builder(
                         padding: const EdgeInsets.only(bottom: DokkoTokens.space16),

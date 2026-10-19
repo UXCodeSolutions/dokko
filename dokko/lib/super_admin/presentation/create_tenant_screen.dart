@@ -419,7 +419,7 @@ class _CreateTenantScreenState extends ConsumerState<CreateTenantScreen> {
                     ),
                     const SizedBox(width: DokkoTokens.space16),
                     DokkoButton(
-                      label: 'Crear Tenant',
+                      label: 'Crear Cliente',
                       isLoading: _isLoading,
                       onPressed: _handleCreate,
                     ),

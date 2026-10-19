@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 import postgrest.exceptions
 
@@ -19,6 +20,15 @@ app = FastAPI(
     title="Dokko Backend API",
     description="API Gateway para la plataforma Dokko. Valida JWTs de Supabase y aplica lógica de negocio por módulo.",
     version="1.0.0",
+)
+
+# CORS — permite llamadas desde el frontend web (Flutter web, Chrome dev, etc.)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 

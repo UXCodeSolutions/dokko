@@ -49,7 +49,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               children: [
                 Image.asset(
                   'assets/images/dokkologos/dokkoLogoClaro.png',
-                  height: 48,
+                  height: 72,
+                  fit: BoxFit.contain,
                 ),
                 const SizedBox(height: DokkoTokens.space24),
                 const Text(
