@@ -33,7 +33,7 @@ class SupportModeBanner extends ConsumerWidget {
             'MODO SOPORTE ACTIVO — Estás viendo la cuenta de un tenant.',
             style: TextStyle(
               color: DokkoTokens.amber,
-              fontSize: 12,
+              fontSize: 13,
               fontWeight: FontWeight.w600,
               letterSpacing: 0.2,
             ),
@@ -58,7 +58,7 @@ class SupportModeBanner extends ConsumerWidget {
                 'Salir del modo soporte',
                 style: TextStyle(
                   color: DokkoTokens.amber,
-                  fontSize: 12,
+                  fontSize: 13,
                   fontWeight: FontWeight.w600,
                 ),
               ),

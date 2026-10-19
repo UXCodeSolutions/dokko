@@ -209,7 +209,7 @@ class _TenantCardState extends State<TenantCard> {
                                   overflow: TextOverflow.ellipsis,
                                   style: const TextStyle(
                                     color: DokkoTokens.text,
-                                    fontSize: 15,
+                                    fontSize: 16,
                                     fontWeight: FontWeight.w700,
                                   ),
                                 ),
@@ -283,14 +283,23 @@ class _MiniInfo extends StatelessWidget {
       children: [
         Text(
           label.toUpperCase(),
-          style: const TextStyle(color: DokkoTokens.text3, fontSize: 10),
+          style: const TextStyle(
+            color: DokkoTokens.text3,
+            fontSize: 11.5,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.5,
+          ),
         ),
-        const SizedBox(height: 2),
+        const SizedBox(height: 3),
         Text(
           value,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: const TextStyle(color: DokkoTokens.text2, fontSize: 12),
+          style: const TextStyle(
+            color: DokkoTokens.text2,
+            fontSize: 13.5,
+            fontWeight: FontWeight.w500,
+          ),
         ),
       ],
     );
@@ -316,7 +325,7 @@ class _ModulePill extends StatelessWidget {
         label,
         style: TextStyle(
           color: color,
-          fontSize: 11,
+          fontSize: 12,
           fontWeight: FontWeight.w600,
         ),
       ),

@@ -91,7 +91,7 @@ class _SuperAdminLoginScreenState extends ConsumerState<SuperAdminLoginScreen> {
                           'ACCESO SUPER-ADMIN',
                           style: TextStyle(
                             color: DokkoTokens.amber,
-                            fontSize: 11,
+                            fontSize: 12.5,
                             fontWeight: FontWeight.w700,
                             letterSpacing: 0.5,
                           ),

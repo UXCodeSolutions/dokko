@@ -71,7 +71,7 @@ class AppShell extends ConsumerWidget {
                         module.title,
                         style: TextStyle(
                           color: brand.onAccent.withValues(alpha: 0.85),
-                          fontSize: 11,
+                          fontSize: 12.5,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -270,7 +270,7 @@ class _DokkoSidebar extends ConsumerWidget {
                         module?.title ?? 'Dokko',
                         style: TextStyle(
                           color: brand.onAccent.withValues(alpha: 0.85),
-                          fontSize: 11,
+                          fontSize: 12.5,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -439,13 +439,13 @@ class _NavItemState extends State<_NavItem> {
                 ),
               ),
               const SizedBox(width: 8),
-              Icon(widget.item.icon, size: 16, color: iconColor),
+              Icon(widget.item.icon, size: 18, color: iconColor),
               const SizedBox(width: DokkoTokens.space12),
               Text(
                 widget.item.label,
                 style: TextStyle(
                   color: textColor,
-                  fontSize: 13,
+                  fontSize: 14.5,
                   fontWeight: widget.isActive ? FontWeight.w600 : FontWeight.w400,
                 ),
               ),
@@ -517,13 +517,13 @@ class _NavEntryState extends State<_NavEntry> {
           ),
           child: Row(
             children: [
-              Icon(widget.icon, size: 16, color: iconColor),
+              Icon(widget.icon, size: 18, color: iconColor),
               const SizedBox(width: DokkoTokens.space12),
               Text(
                 widget.label,
                 style: TextStyle(
                   color: textColor,
-                  fontSize: 13,
+                  fontSize: 14.5,
                   fontWeight: widget.isActive ? FontWeight.w600 : FontWeight.w400,
                 ),
               ),
@@ -575,11 +575,11 @@ class _NavLogoutButtonState extends ConsumerState<_NavLogoutButton> {
           ),
           child: const Row(
             children: [
-              Icon(Icons.logout_rounded, size: 16, color: DokkoTokens.text3),
+              Icon(Icons.logout_rounded, size: 18, color: DokkoTokens.text3),
               SizedBox(width: DokkoTokens.space12),
               Text(
                 'Cerrar sesión',
-                style: TextStyle(color: DokkoTokens.text2, fontSize: 13),
+                style: TextStyle(color: DokkoTokens.text2, fontSize: 14),
               ),
             ],
           ),

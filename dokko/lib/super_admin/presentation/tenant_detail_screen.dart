@@ -620,7 +620,7 @@ class _TenantDetailScreenState extends ConsumerState<TenantDetailScreen>
                                 Text(
                                   'ID: ${widget.tenantId.substring(0, 8)}…',
                                   style: const TextStyle(
-                                      color: DokkoTokens.text2, fontSize: 11),
+                                      color: DokkoTokens.text2, fontSize: 12.5),
                                 ),
                                 const SizedBox(width: 4),
                                 const Icon(Icons.copy_rounded,
@@ -840,7 +840,7 @@ class _TenantDetailScreenState extends ConsumerState<TenantDetailScreen>
                       'Contraste $level (${ratio.toStringAsFixed(1)}:1)',
                       style: TextStyle(
                         color: isValid ? DokkoTokens.green : DokkoTokens.red,
-                        fontSize: 11,
+                        fontSize: 12.5,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
@@ -1103,7 +1103,10 @@ class _TenantDetailScreenState extends ConsumerState<TenantDetailScreen>
               Expanded(
                 child: Text(
                   title,
-                  style: const TextStyle(color: DokkoTokens.text3, fontSize: 11),
+                  style: const TextStyle(
+                      color: DokkoTokens.text3,
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.w500),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -1170,7 +1173,7 @@ class _TenantDetailScreenState extends ConsumerState<TenantDetailScreen>
           Text(
             _moduleName(slug),
             style: TextStyle(
-                color: color, fontSize: 11, fontWeight: FontWeight.w600),
+                color: color, fontSize: 12.5, fontWeight: FontWeight.w600),
           ),
         ],
       ),
@@ -1243,7 +1246,7 @@ class _TenantDetailScreenState extends ConsumerState<TenantDetailScreen>
             Text(
               status.toUpperCase(),
               style: TextStyle(
-                  color: color, fontSize: 11, fontWeight: FontWeight.w700),
+                  color: color, fontSize: 12, fontWeight: FontWeight.w700),
             ),
             const SizedBox(width: 4),
             Icon(Icons.arrow_drop_down_rounded, size: 16, color: color),

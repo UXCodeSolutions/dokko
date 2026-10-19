@@ -237,13 +237,13 @@ class _TenantBillingScreenState extends ConsumerState<TenantBillingScreen> {
                                                 '${o['days_overdue']} días vencido · '
                                                 '${o['in_grace'] == true ? "dentro de gracia (${o['grace_days']}d)" : "FUERA de gracia"}'
                                                 '${o['status'] == 'suspended' ? ' · SUSPENDIDO' : ''}',
-                                                style: const TextStyle(fontSize: 11, color: DokkoTokens.text2),
+                                                style: const TextStyle(fontSize: 12.5, color: DokkoTokens.text2),
                                               ),
                                             ],
                                           ),
                                         ),
                                         Text(o['owner_email'] as String? ?? '',
-                                            style: const TextStyle(fontSize: 11, color: DokkoTokens.text2)),
+                                            style: const TextStyle(fontSize: 12.5, color: DokkoTokens.text2)),
                                       ],
                                     ),
                                   )),
@@ -308,7 +308,7 @@ class _BuildTenantsGraceTable extends StatelessWidget {
                       child: Text(
                         (t['status'] as String? ?? 'active').toUpperCase(),
                         style: TextStyle(
-                          fontSize: 10,
+                          fontSize: 12,
                           fontWeight: FontWeight.w600,
                           color: _statusColor(t['status'] as String? ?? 'active'),
                         ),

@@ -121,7 +121,7 @@ class _ModulesCatalogScreenState extends ConsumerState<ModulesCatalogScreen> {
             const Text(
               'PLANES BASE',
               style: TextStyle(
-                fontSize: 11,
+                fontSize: 12.5,
                 fontWeight: FontWeight.w600,
                 color: DokkoTokens.text3,
                 letterSpacing: 0.5,

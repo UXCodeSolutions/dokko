@@ -33,4 +33,21 @@ class DokkoTokens {
   static const double radiusSm = 5.0;
   static const double radiusMd = 7.0;
   static const double radiusLg = 10.0;
+
+  // Escala Tipográfica Responsiva (Min / Max Clamped)
+  // En móvil el texto nunca baja de 12px; en laptop nunca baja de 13px.
+  static double fontCaption(BuildContext context) =>
+      MediaQuery.sizeOf(context).width < 800 ? 12.0 : 13.0;
+
+  static double fontBodySm(BuildContext context) =>
+      MediaQuery.sizeOf(context).width < 800 ? 13.0 : 14.0;
+
+  static double fontBody(BuildContext context) =>
+      MediaQuery.sizeOf(context).width < 800 ? 14.0 : 15.0;
+
+  static double fontSubheading(BuildContext context) =>
+      MediaQuery.sizeOf(context).width < 800 ? 16.0 : 17.5;
+
+  static double fontHeading(BuildContext context) =>
+      MediaQuery.sizeOf(context).width < 800 ? 20.0 : 24.0;
 }
