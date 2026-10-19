@@ -1,11 +1,12 @@
 import 'dart:typed_data';
 import 'dart:convert';
+import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:palette_generator/palette_generator.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
 import '../../../core/theme/dokko_tokens.dart';
@@ -95,15 +96,76 @@ class _CreateTenantScreenState extends ConsumerState<CreateTenantScreen> {
     }
   }
 
+  Color? _hexToColor(String? hex) {
+    if (hex == null || hex.isEmpty) return null;
+    final clean = hex.replaceAll('#', '');
+    if (clean.length == 6) {
+      final val = int.tryParse('FF$clean', radix: 16);
+      if (val != null) return Color(val);
+    }
+    return null;
+  }
+
   Future<void> _extractColor(Uint8List imageBytes) async {
     try {
-      final imageProvider = MemoryImage(imageBytes);
-      final palette = await PaletteGenerator.fromImageProvider(imageProvider);
-      
+      final token = Supabase.instance.client.auth.currentSession?.accessToken;
+      final baseUrl = dotenv.env['API_BASE_URL'] ?? 'http://localhost:8000';
+      final request = http.MultipartRequest(
+        'POST',
+        Uri.parse('$baseUrl/super-admin/brand/extract'),
+      );
+      if (token != null) {
+        request.headers['Authorization'] = 'Bearer $token';
+      }
+      request.files.add(http.MultipartFile.fromBytes(
+        'file',
+        imageBytes,
+        filename: 'logo.${_logoExt ?? "png"}',
+      ));
+      final streamed = await request.send();
+      if (streamed.statusCode == 200) {
+        final respStr = await streamed.stream.bytesToString();
+        final data = jsonDecode(respStr) as Map<String, dynamic>;
+        final pColor = _hexToColor(data['primary_color'] as String?);
+        final sColor = _hexToColor(data['secondary_color'] as String?);
+        if (pColor != null && mounted) {
+          setState(() {
+            _extractedPrimaryColor = pColor;
+            _extractedSecondaryColor = sColor ??
+                HSLColor.fromColor(pColor).withLightness(0.15).withSaturation(0.3).toColor();
+          });
+          return;
+        }
+      }
+    } catch (_) {
+      // Fallback local si el backend no responde
+    }
+
+    try {
+      final ui.Image image = await decodeImageFromList(imageBytes);
+      final byteData = await image.toByteData(format: ui.ImageByteFormat.rawRgba);
+      if (byteData == null) return;
+
+      final bytes = byteData.buffer.asUint8List();
+      int rSum = 0, gSum = 0, bSum = 0;
+      final step = (bytes.length ~/ 400).clamp(1, 1000) * 4;
+      int sampled = 0;
+      for (int i = 0; i < bytes.length; i += step) {
+        rSum += bytes[i];
+        gSum += bytes[i + 1];
+        bSum += bytes[i + 2];
+        sampled++;
+      }
+      if (sampled == 0) return;
+      final dominant = Color.fromARGB(255, rSum ~/ sampled, gSum ~/ sampled, bSum ~/ sampled);
+
       if (mounted) {
         setState(() {
-          _extractedPrimaryColor = palette.dominantColor?.color ?? palette.vibrantColor?.color;
-          _extractedSecondaryColor = palette.vibrantColor?.color ?? palette.mutedColor?.color ?? DokkoTokens.surface;
+          _extractedPrimaryColor = dominant;
+          _extractedSecondaryColor = HSLColor.fromColor(dominant)
+              .withLightness(0.15)
+              .withSaturation(0.3)
+              .toColor();
         });
       }
     } catch (e) {
@@ -153,10 +215,10 @@ class _CreateTenantScreenState extends ConsumerState<CreateTenantScreen> {
           ? '#${(_extractedSecondaryColor!.toARGB32() & 0xFFFFFF).toRadixString(16).padLeft(6, '0').toUpperCase()}'
           : '#111113';
 
-      // Llamar al backend (service role bypasea RLS — no hay problemas de permisos)
+      final baseUrl = dotenv.env['API_BASE_URL'] ?? 'http://localhost:8000';
       final token = Supabase.instance.client.auth.currentSession?.accessToken;
       final response = await http.post(
-        Uri.parse('http://localhost:8000/super-admin/tenants'),
+        Uri.parse('$baseUrl/super-admin/tenants'),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
