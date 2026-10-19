@@ -830,7 +830,7 @@ class _ProductTile extends StatelessWidget {
                           : Image.network(
                               _imageUrl(product)!,
                               fit: BoxFit.cover,
-                              errorBuilder: (_, _, _) => Center(
+                              errorBuilder: (context, error, stackTrace) => Center(
                                 child: Icon(
                                   Icons.broken_image_outlined,
                                   color: DokkoTokens.text3,
@@ -1302,7 +1302,7 @@ class _ProductModalState extends ConsumerState<_ProductModal> {
                           ? Image.memory(
                               _imageBytes!,
                               fit: BoxFit.cover,
-                              errorBuilder: (_, _, _) => const Center(
+                              errorBuilder: (context, error, stackTrace) => const Center(
                                 child: Icon(Icons.broken_image_outlined,
                                     color: DokkoTokens.text3),
                               ),
@@ -1310,7 +1310,7 @@ class _ProductModalState extends ConsumerState<_ProductModal> {
                           : Image.network(
                               _imageUrl!,
                               fit: BoxFit.cover,
-                              errorBuilder: (_, _, _) => const Center(
+                              errorBuilder: (ctx, err, st) => const Center(
                                 child: Icon(Icons.broken_image_outlined,
                                     color: DokkoTokens.text3),
                               ),

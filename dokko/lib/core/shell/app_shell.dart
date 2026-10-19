@@ -270,7 +270,7 @@ class _BrandLogo extends StatelessWidget {
           width: 28,
           height: 28,
           fit: BoxFit.cover,
-          errorBuilder: (_, _, _) => _brandOrbital(brand),
+          errorBuilder: (context, error, stackTrace) => _brandOrbital(brand),
         ),
       );
     }

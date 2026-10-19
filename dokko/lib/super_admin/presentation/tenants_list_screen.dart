@@ -402,7 +402,7 @@ class _TenantLogo extends StatelessWidget {
           : Image.network(
               logo,
               fit: BoxFit.cover,
-              errorBuilder: (_, _, _) =>
+              errorBuilder: (context, error, stackTrace) =>
                   _AvatarFallback(initials: initials, color: color),
             ),
     );
