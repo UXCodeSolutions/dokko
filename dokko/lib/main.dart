@@ -32,8 +32,8 @@ class DokkoApp extends ConsumerWidget {
 
     final colorScheme = ColorScheme.fromSeed(
       seedColor: brand.accent,
-      brightness: Brightness.light,
-      surface: const Color(0xFFF8F8FA),
+      brightness: Brightness.dark,
+      surface: const Color(0xFF111113),
     );
 
     return MaterialApp.router(
