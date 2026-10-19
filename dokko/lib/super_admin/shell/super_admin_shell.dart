@@ -115,7 +115,7 @@ class _SuperAdminSidebar extends ConsumerWidget {
                 ),
                 _NavItem(
                   icon: Icons.view_module_rounded,
-                  label: 'Módulos y Planes',
+                  label: 'Módulos',
                   path: '/super-admin/modules',
                   isActive: currentLocation.startsWith('/super-admin/modules'),
                 ),
