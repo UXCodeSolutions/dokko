@@ -269,7 +269,7 @@ class _CreateTenantScreenState extends ConsumerState<CreateTenantScreen> {
               ),
               const SizedBox(width: DokkoTokens.space8),
               const Text(
-                'Nuevo Tenant',
+                'Nuevo Cliente',
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.w600,
@@ -279,10 +279,12 @@ class _CreateTenantScreenState extends ConsumerState<CreateTenantScreen> {
             ],
           ),
           const SizedBox(height: DokkoTokens.space24),
-          DokkoCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
+          Expanded(
+            child: SingleChildScrollView(
+              child: DokkoCard(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
                 DokkoInput(
                   label: 'Nombre del negocio',
                   placeholder: 'Ej. Gym Fitness',
@@ -428,8 +430,10 @@ class _CreateTenantScreenState extends ConsumerState<CreateTenantScreen> {
               ],
             ),
           ),
-        ],
+        ),
       ),
-    );
+    ],
+  ),
+);
   }
 }

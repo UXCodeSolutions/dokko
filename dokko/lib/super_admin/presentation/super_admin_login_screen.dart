@@ -53,56 +53,65 @@ class _SuperAdminLoginScreenState extends ConsumerState<SuperAdminLoginScreen> {
 
     return Scaffold(
       backgroundColor: DokkoTokens.bg,
-      body: Center(
-        child: SizedBox(
-          width: 380,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Logotipo grande de Dokko
-              Image.asset(
-                'assets/images/dokkologos/dokkoLogoClaro.png',
-                height: 52,
-                fit: BoxFit.contain,
-              ),
-              const SizedBox(height: DokkoTokens.space24),
-              // Badge identificador
-              Container(
-                margin: const EdgeInsets.only(bottom: DokkoTokens.space24),
-                padding: const EdgeInsets.symmetric(
-                    horizontal: DokkoTokens.space12, vertical: DokkoTokens.space8),
-                decoration: BoxDecoration(
-                  color: DokkoTokens.amber.withValues(alpha: 0.12),
-                  border: Border.all(color: DokkoTokens.amber.withValues(alpha: 0.3)),
-                  borderRadius: BorderRadius.circular(DokkoTokens.radiusSm),
-                ),
-                child: const Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.shield_rounded, size: 14, color: DokkoTokens.amber),
-                    SizedBox(width: 6),
-                    Text(
-                      'ACCESO SUPER-ADMIN',
-                      style: TextStyle(
-                        color: DokkoTokens.amber,
-                        fontSize: 11,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 0.5,
-                      ),
+      body: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(
+              horizontal: DokkoTokens.space16,
+              vertical: DokkoTokens.space24,
+            ),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 380),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Logotipo grande de Dokko
+                  Image.asset(
+                    'assets/images/dokkologos/dokkoLogoClaro.png',
+                    height: 52,
+                    fit: BoxFit.contain,
+                  ),
+                  const SizedBox(height: DokkoTokens.space24),
+                  // Badge identificador
+                  Container(
+                    margin: const EdgeInsets.only(bottom: DokkoTokens.space24),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: DokkoTokens.space12, vertical: DokkoTokens.space8),
+                    decoration: BoxDecoration(
+                      color: DokkoTokens.amber.withValues(alpha: 0.12),
+                      border: Border.all(color: DokkoTokens.amber.withValues(alpha: 0.3)),
+                      borderRadius: BorderRadius.circular(DokkoTokens.radiusSm),
                     ),
-                  ],
-                ),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.shield_rounded, size: 14, color: DokkoTokens.amber),
+                        SizedBox(width: 6),
+                        Text(
+                          'ACCESO SUPER-ADMIN',
+                          style: TextStyle(
+                            color: DokkoTokens.amber,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  DokkoCard(
+                    child: authState.step == SuperAdminAuthStep.needsMfa
+                        ? _buildMfaForm(authState)
+                        : _buildLoginForm(authState),
+                  ),
+                ],
               ),
-              DokkoCard(
-                child: authState.step == SuperAdminAuthStep.needsMfa
-                    ? _buildMfaForm(authState)
-                    : _buildLoginForm(authState),
-              ),
-            ],
+            ),
           ),
         ),
       ),
     );
+
   }
 
   Widget _buildLoginForm(SuperAdminAuthState authState) {

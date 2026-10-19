@@ -17,7 +17,7 @@ class GymDashboardScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: DokkoTokens.bg,
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(DokkoTokens.space24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -35,36 +35,61 @@ class GymDashboardScreen extends ConsumerWidget {
               loading: () => const Center(child: CircularProgressIndicator()),
               error: (err, _) => Text('Error: $err', style: const TextStyle(color: Colors.red)),
               data: (kpis) {
-                return Row(
-                  children: [
-                    _KpiCard(
-                      title: 'Miembros Activos',
-                      value: '${kpis['active_members_count']}',
-                      icon: Icons.people_rounded,
-                      color: primaryColor,
-                    ),
-                    const SizedBox(width: DokkoTokens.space16),
-                    _KpiCard(
-                      title: 'Ingresos del Mes',
-                      value: '\$${kpis['monthly_revenue']}',
-                      icon: Icons.attach_money_rounded,
-                      color: DokkoTokens.green,
-                    ),
-                    const SizedBox(width: DokkoTokens.space16),
-                    _KpiCard(
-                      title: 'Vencimientos a 7 Días',
-                      value: '${kpis['upcoming_expirations_count']}',
-                      icon: Icons.warning_rounded,
-                      color: DokkoTokens.amber,
-                    ),
-                    const SizedBox(width: DokkoTokens.space16),
-                    _KpiCard(
-                      title: 'Check-ins Hoy',
-                      value: '${kpis['checkins_today']}',
-                      icon: Icons.qr_code_scanner_rounded,
-                      color: primaryColor,
-                    ),
-                  ],
+                final cards = [
+                  _KpiCard(
+                    title: 'Miembros Activos',
+                    value: '${kpis['active_members_count']}',
+                    icon: Icons.people_rounded,
+                    color: primaryColor,
+                  ),
+                  _KpiCard(
+                    title: 'Ingresos del Mes',
+                    value: '\$${kpis['monthly_revenue']}',
+                    icon: Icons.attach_money_rounded,
+                    color: DokkoTokens.green,
+                  ),
+                  _KpiCard(
+                    title: 'Vencimientos a 7 Días',
+                    value: '${kpis['upcoming_expirations_count']}',
+                    icon: Icons.warning_rounded,
+                    color: DokkoTokens.amber,
+                  ),
+                  _KpiCard(
+                    title: 'Check-ins Hoy',
+                    value: '${kpis['checkins_today']}',
+                    icon: Icons.qr_code_scanner_rounded,
+                    color: primaryColor,
+                  ),
+                ];
+
+                return LayoutBuilder(
+                  builder: (context, constraints) {
+                    if (constraints.maxWidth < 680) {
+                      final isSingleCol = constraints.maxWidth < 420;
+                      return GridView.count(
+                        crossAxisCount: isSingleCol ? 1 : 2,
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        crossAxisSpacing: DokkoTokens.space12,
+                        mainAxisSpacing: DokkoTokens.space12,
+                        childAspectRatio: isSingleCol ? 2.6 : 1.35,
+                        children: cards,
+                      );
+                    }
+
+                    return Row(
+                      children: cards
+                          .map((c) => Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: DokkoTokens.space8,
+                                  ),
+                                  child: c,
+                                ),
+                              ))
+                          .toList(),
+                    );
+                  },
                 );
               },
             ),
@@ -90,14 +115,13 @@ class _KpiCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: DokkoCard(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(icon, size: 24, color: color),
+    return DokkoCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, size: 24, color: color),
                 const SizedBox(width: DokkoTokens.space8),
                 Expanded(
                   child: Text(
@@ -123,7 +147,7 @@ class _KpiCard extends StatelessWidget {
             ),
           ],
         ),
-      ),
-    );
+      );
   }
 }
+

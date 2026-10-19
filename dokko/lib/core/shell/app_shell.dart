@@ -28,21 +28,97 @@ class AppShell extends ConsumerWidget {
       return SuspendedTenantScreen(tenant: tenant);
     }
 
-    return Scaffold(
-      backgroundColor: DokkoTokens.bg,
-      body: Column(
-        children: [
-          if (inSupportMode) const SupportModeBanner(),
-          Expanded(
-            child: Row(
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isMobile = constraints.maxWidth < 800;
+        final brand = ref.watch(brandColorsProvider);
+
+        if (isMobile) {
+          return Scaffold(
+            backgroundColor: DokkoTokens.bg,
+            appBar: AppBar(
+              backgroundColor: DokkoTokens.surface,
+              elevation: 0,
+              centerTitle: false,
+              titleSpacing: 0,
+              title: Row(
+                children: [
+                  _BrandLogo(logoUrl: tenant?.logoUrl),
+                  const SizedBox(width: DokkoTokens.space8),
+                  Expanded(
+                    child: Text(
+                      tenant?.name ?? 'Dokko',
+                      style: const TextStyle(
+                        color: DokkoTokens.text,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  if (module != null) ...[
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: DokkoTokens.space8,
+                        vertical: 3,
+                      ),
+                      decoration: BoxDecoration(
+                        color: brand.accent.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                      child: Text(
+                        module.title,
+                        style: TextStyle(
+                          color: brand.onAccent.withValues(alpha: 0.85),
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: DokkoTokens.space12),
+                  ],
+                ],
+              ),
+              leading: Builder(
+                builder: (ctx) => IconButton(
+                  icon: const Icon(Icons.menu_rounded, color: DokkoTokens.text),
+                  onPressed: () => Scaffold.of(ctx).openDrawer(),
+                ),
+              ),
+            ),
+            drawer: Drawer(
+              backgroundColor: DokkoTokens.surface,
+              child: SafeArea(
+                child: _DokkoSidebar(module: module, tenant: tenant, isDrawer: true),
+              ),
+            ),
+            body: Column(
               children: [
-                _DokkoSidebar(module: module, tenant: tenantAsync.value),
-                Expanded(child: child),
+                if (inSupportMode) const SupportModeBanner(),
+                Expanded(child: SafeArea(child: child)),
               ],
             ),
+          );
+        }
+
+        return Scaffold(
+          backgroundColor: DokkoTokens.bg,
+          body: Column(
+            children: [
+              if (inSupportMode) const SupportModeBanner(),
+              Expanded(
+                child: Row(
+                  children: [
+                    _DokkoSidebar(module: module, tenant: tenant),
+                    Expanded(child: child),
+                  ],
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
@@ -125,8 +201,9 @@ class SuspendedTenantScreen extends StatelessWidget {
 class _DokkoSidebar extends ConsumerWidget {
   final ModuleDefinition? module;
   final TenantData? tenant;
+  final bool isDrawer;
 
-  const _DokkoSidebar({this.module, this.tenant});
+  const _DokkoSidebar({this.module, this.tenant, this.isDrawer = false});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -134,10 +211,12 @@ class _DokkoSidebar extends ConsumerWidget {
     final brand = ref.watch(brandColorsProvider);
 
     return Container(
-      width: 220,
-      decoration: const BoxDecoration(
+      width: isDrawer ? double.infinity : 220,
+      decoration: BoxDecoration(
         color: DokkoTokens.surface,
-        border: Border(right: BorderSide(color: DokkoTokens.line)),
+        border: isDrawer
+            ? null
+            : const Border(right: BorderSide(color: DokkoTokens.line)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -328,7 +407,12 @@ class _NavItemState extends State<_NavItem> {
       onExit: (_) => setState(() => _hovered = false),
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
-        onTap: () => context.go(widget.item.path),
+        onTap: () {
+          if (Scaffold.maybeOf(context)?.isDrawerOpen ?? false) {
+            Navigator.of(context).pop();
+          }
+          context.go(widget.item.path);
+        },
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 150),
           margin: const EdgeInsets.symmetric(
@@ -411,7 +495,12 @@ class _NavEntryState extends State<_NavEntry> {
       onExit: (_) => setState(() => _hovered = false),
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
-        onTap: widget.onTap,
+        onTap: () {
+          if (Scaffold.maybeOf(context)?.isDrawerOpen ?? false) {
+            Navigator.of(context).pop();
+          }
+          widget.onTap();
+        },
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 150),
           margin: const EdgeInsets.symmetric(
@@ -464,6 +553,9 @@ class _NavLogoutButtonState extends ConsumerState<_NavLogoutButton> {
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
         onTap: () async {
+            if (Scaffold.maybeOf(context)?.isDrawerOpen ?? false) {
+              Navigator.of(context).pop();
+            }
             try {
               await ref.read(authProvider.notifier).signOut();
             } catch (e) {

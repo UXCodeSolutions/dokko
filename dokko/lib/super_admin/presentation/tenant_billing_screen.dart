@@ -141,27 +141,36 @@ class _TenantBillingScreenState extends ConsumerState<TenantBillingScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Row(
+          Wrap(
+            alignment: WrapAlignment.spaceBetween,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: DokkoTokens.space12,
+            runSpacing: DokkoTokens.space12,
             children: [
               const Text(
                 'Facturación Global',
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600, color: DokkoTokens.text),
               ),
-              const Spacer(),
-              DokkoButton(
-                label: 'Revisar suspensiones',
-                variant: DokkoButtonVariant.secondary,
-                isLoading: _checking,
-                onPressed: _checking ? null : _runSuspensionCheck,
-              ),
-              const SizedBox(width: DokkoTokens.space12),
-              DokkoButton(
-                label: 'Actualizar',
-                variant: DokkoButtonVariant.outline,
-                onPressed: _isLoading ? null : _load,
+              Wrap(
+                spacing: DokkoTokens.space12,
+                runSpacing: DokkoTokens.space8,
+                children: [
+                  DokkoButton(
+                    label: 'Revisar suspensiones',
+                    variant: DokkoButtonVariant.secondary,
+                    isLoading: _checking,
+                    onPressed: _checking ? null : _runSuspensionCheck,
+                  ),
+                  DokkoButton(
+                    label: 'Actualizar',
+                    variant: DokkoButtonVariant.outline,
+                    onPressed: _isLoading ? null : _load,
+                  ),
+                ],
               ),
             ],
           ),
+
           if (_lastCheckMessage != null) ...[
             const SizedBox(height: DokkoTokens.space12),
             Container(

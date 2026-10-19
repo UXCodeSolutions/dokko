@@ -158,22 +158,29 @@ class _TenantDetailScreenState extends ConsumerState<TenantDetailScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Row(
+          Wrap(
+            alignment: WrapAlignment.spaceBetween,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: DokkoTokens.space12,
+            runSpacing: DokkoTokens.space12,
             children: [
-              IconButton(
-                icon: const Icon(Icons.arrow_back_rounded, color: DokkoTokens.text),
-                onPressed: () => context.go('/super-admin/tenants'),
-              ),
-              const SizedBox(width: DokkoTokens.space8),
-              Expanded(
-                child: Text(
-                  _tenant?['name'] ?? 'Cargando…',
-                  style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.w600,
-                    color: DokkoTokens.text,
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.arrow_back_rounded, color: DokkoTokens.text),
+                    onPressed: () => context.go('/super-admin/tenants'),
                   ),
-                ),
+                  const SizedBox(width: DokkoTokens.space8),
+                  Text(
+                    _tenant?['name'] ?? 'Cargando…',
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.w600,
+                      color: DokkoTokens.text,
+                    ),
+                  ),
+                ],
               ),
               DokkoButton(
                 label: 'Entrar en modo soporte',
@@ -191,39 +198,41 @@ class _TenantDetailScreenState extends ConsumerState<TenantDetailScreen> {
                   style: TextStyle(color: DokkoTokens.text2)),
             )
           else
-            ListView(
-              shrinkWrap: true,
-              children: [
-                DokkoCard(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _InfoRow(label: 'ID', value: _tenant!['id']),
-                      _InfoRow(label: 'Nombre', value: _tenant!['name']),
-                      _InfoRow(label: 'Módulo', value: _tenant!['module_slug']),
-                      _InfoRow(
-                        label: 'Propietario',
-                        value: _tenant!['account_owners']?['email'] ?? 'Sin asignar',
-                      ),
-                      _InfoRow(
-                        label: 'Email propietario',
-                        value: _tenant!['account_owners']?['email'] ?? '—',
-                      ),
-                    ],
+            Expanded(
+              child: ListView(
+                children: [
+                  DokkoCard(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _InfoRow(label: 'ID', value: _tenant!['id']),
+                        _InfoRow(label: 'Nombre', value: _tenant!['name']),
+                        _InfoRow(label: 'Módulo', value: _tenant!['module_slug']),
+                        _InfoRow(
+                          label: 'Propietario',
+                          value: _tenant!['account_owners']?['email'] ?? 'Sin asignar',
+                        ),
+                        _InfoRow(
+                          label: 'Email propietario',
+                          value: _tenant!['account_owners']?['email'] ?? '—',
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                const SizedBox(height: DokkoTokens.space24),
-                _BrandCard(
-                  tenantId: widget.tenantId,
-                  brandConfig: _tenant!['brand_config'] as Map<String, dynamic>? ?? {},
-                  preview: _brandPreview,
-                  generating: _generatingBrand,
-                  saving: _savingBrand,
-                  onGenerate: _generateColorsFromLogo,
-                  onSave: _saveBrand,
-                ),
-              ],
+                  const SizedBox(height: DokkoTokens.space24),
+                  _BrandCard(
+                    tenantId: widget.tenantId,
+                    brandConfig: _tenant!['brand_config'] as Map<String, dynamic>? ?? {},
+                    preview: _brandPreview,
+                    generating: _generatingBrand,
+                    saving: _savingBrand,
+                    onGenerate: _generateColorsFromLogo,
+                    onSave: _saveBrand,
+                  ),
+                ],
+              ),
             ),
+
         ],
       ),
     );

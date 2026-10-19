@@ -12,30 +12,69 @@ class SuperAdminShell extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Scaffold(
-      backgroundColor: DokkoTokens.bg,
-      body: Row(
-        children: [
-          const _SuperAdminSidebar(),
-          Expanded(child: child),
-        ],
-      ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isMobile = constraints.maxWidth < 800;
+
+        if (isMobile) {
+          return Scaffold(
+            backgroundColor: DokkoTokens.bg,
+            appBar: AppBar(
+              backgroundColor: DokkoTokens.surface,
+              elevation: 0,
+              centerTitle: true,
+              title: Image.asset(
+                'assets/images/dokkologos/dokkoLogoClaro.png',
+                height: 28,
+                fit: BoxFit.contain,
+              ),
+              leading: Builder(
+                builder: (ctx) => IconButton(
+                  icon: const Icon(Icons.menu_rounded, color: DokkoTokens.text),
+                  onPressed: () => Scaffold.of(ctx).openDrawer(),
+                ),
+              ),
+            ),
+            drawer: const Drawer(
+              backgroundColor: DokkoTokens.surface,
+              child: SafeArea(
+                child: _SuperAdminSidebar(isDrawer: true),
+              ),
+            ),
+            body: SafeArea(child: child),
+          );
+        }
+
+        return Scaffold(
+          backgroundColor: DokkoTokens.bg,
+          body: Row(
+            children: [
+              const _SuperAdminSidebar(),
+              Expanded(child: child),
+            ],
+          ),
+        );
+      },
     );
   }
 }
 
 class _SuperAdminSidebar extends ConsumerWidget {
-  const _SuperAdminSidebar();
+  final bool isDrawer;
+
+  const _SuperAdminSidebar({this.isDrawer = false});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final currentLocation = GoRouterState.of(context).uri.toString();
 
     return Container(
-      width: 220,
-      decoration: const BoxDecoration(
+      width: isDrawer ? double.infinity : 220,
+      decoration: BoxDecoration(
         color: DokkoTokens.surface,
-        border: Border(right: BorderSide(color: DokkoTokens.line)),
+        border: isDrawer
+            ? null
+            : const Border(right: BorderSide(color: DokkoTokens.line)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -144,7 +183,12 @@ class _NavItemState extends State<_NavItem> {
       onExit: (_) => setState(() => _hovered = false),
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
-        onTap: () => context.go(widget.path),
+        onTap: () {
+          if (Scaffold.maybeOf(context)?.isDrawerOpen ?? false) {
+            Navigator.of(context).pop();
+          }
+          context.go(widget.path);
+        },
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 150),
           margin: const EdgeInsets.symmetric(
@@ -195,6 +239,9 @@ class _NavLogoutButtonState extends ConsumerState<_NavLogoutButton> {
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
         onTap: () async {
+          if (Scaffold.maybeOf(context)?.isDrawerOpen ?? false) {
+            Navigator.of(context).pop();
+          }
           await Supabase.instance.client.auth.signOut();
           ref.read(superAdminAuthProvider.notifier).reset();
           if (context.mounted) {
