@@ -4,6 +4,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'dart:convert';
 import '../../../core/theme/dokko_tokens.dart';
 import '../../../core/theme/brand_theme.dart';
@@ -40,9 +41,9 @@ class _TenantDetailScreenState extends ConsumerState<TenantDetailScreen> {
       // no solo los que él creó como owner.
       final token =
           Supabase.instance.client.auth.currentSession?.accessToken ?? '';
+      final baseUrl = dotenv.env['API_BASE_URL'] ?? 'http://localhost:8000';
       final response = await http.get(
-        Uri.parse(
-            'http://localhost:8000/super-admin/tenants/${widget.tenantId}'),
+        Uri.parse('$baseUrl/super-admin/tenants/${widget.tenantId}'),
         headers: {'Authorization': 'Bearer $token'},
       );
       if (response.statusCode != 200) {
@@ -82,9 +83,10 @@ class _TenantDetailScreenState extends ConsumerState<TenantDetailScreen> {
     try {
       final token =
           Supabase.instance.client.auth.currentSession?.accessToken ?? '';
+      final baseUrl = dotenv.env['API_BASE_URL'] ?? 'http://localhost:8000';
       final request = http.MultipartRequest(
         'POST',
-        Uri.parse('http://localhost:8000/super-admin/brand/extract'),
+        Uri.parse('$baseUrl/super-admin/brand/extract'),
       );
       request.headers['Authorization'] = 'Bearer $token';
       request.files.add(http.MultipartFile.fromBytes(
@@ -116,9 +118,9 @@ class _TenantDetailScreenState extends ConsumerState<TenantDetailScreen> {
     try {
       final token =
           Supabase.instance.client.auth.currentSession?.accessToken ?? '';
+      final baseUrl = dotenv.env['API_BASE_URL'] ?? 'http://localhost:8000';
       final response = await http.patch(
-        Uri.parse(
-            'http://localhost:8000/super-admin/tenants/${widget.tenantId}/brand'),
+        Uri.parse('$baseUrl/super-admin/tenants/${widget.tenantId}/brand'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
@@ -345,7 +347,7 @@ class _BrandCard extends StatelessWidget {
             ClipRRect(
               borderRadius: BorderRadius.circular(DokkoTokens.radiusMd),
               child: Image.network(logoUrl, height: 48, fit: BoxFit.contain,
-                  errorBuilder: (_, _, _) => const SizedBox()),
+                  errorBuilder: (context, error, stackTrace) => const SizedBox()),
             ),
           ],
         ],

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'dart:convert';
 import '../../theme/dokko_tokens.dart';
 import '../../widgets/dokko_card.dart';
@@ -33,8 +34,9 @@ class _BillingStatementScreenState extends ConsumerState<BillingStatementScreen>
     try {
       final token =
           Supabase.instance.client.auth.currentSession?.accessToken ?? '';
+      final baseUrl = dotenv.env['API_BASE_URL'] ?? 'http://localhost:8000';
       final response = await http.get(
-        Uri.parse('http://localhost:8000/billing/statement'),
+        Uri.parse('$baseUrl/billing/statement'),
         headers: {'Authorization': 'Bearer $token'},
       );
       if (response.statusCode != 200) {

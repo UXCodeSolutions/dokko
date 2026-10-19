@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'dart:convert';
 import '../../../core/theme/dokko_tokens.dart';
 import '../../../core/widgets/dokko_card.dart';
@@ -32,8 +33,9 @@ class _TenantBillingScreenState extends ConsumerState<TenantBillingScreen> {
     setState(() => _isLoading = true);
     try {
       final token = Supabase.instance.client.auth.currentSession?.accessToken ?? '';
+      final baseUrl = dotenv.env['API_BASE_URL'] ?? 'http://localhost:8000';
       final overdueRes = await http.get(
-        Uri.parse('http://localhost:8000/billing/overdue'),
+        Uri.parse('$baseUrl/billing/overdue'),
         headers: {'Authorization': 'Bearer $token'},
       );
       if (overdueRes.statusCode == 200) {
@@ -59,8 +61,9 @@ class _TenantBillingScreenState extends ConsumerState<TenantBillingScreen> {
     setState(() => _checking = true);
     try {
       final token = Supabase.instance.client.auth.currentSession?.accessToken ?? '';
+      final baseUrl = dotenv.env['API_BASE_URL'] ?? 'http://localhost:8000';
       final response = await http.post(
-        Uri.parse('http://localhost:8000/billing/suspension-check'),
+        Uri.parse('$baseUrl/billing/suspension-check'),
         headers: {'Authorization': 'Bearer $token'},
       );
       final data = jsonDecode(response.body) as Map<String, dynamic>;
@@ -85,8 +88,9 @@ class _TenantBillingScreenState extends ConsumerState<TenantBillingScreen> {
 
   Future<void> _setGrace(String tenantId, int days) async {
     final token = Supabase.instance.client.auth.currentSession?.accessToken ?? '';
+    final baseUrl = dotenv.env['API_BASE_URL'] ?? 'http://localhost:8000';
     final response = await http.put(
-      Uri.parse('http://localhost:8000/billing/grace'),
+      Uri.parse('$baseUrl/billing/grace'),
       headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
