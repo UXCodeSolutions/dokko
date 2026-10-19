@@ -161,11 +161,27 @@ class _TenantDetailScreenState extends ConsumerState<TenantDetailScreen>
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: DokkoTokens.surface,
-        title: const Text('Renombrar Cliente',
-            style: TextStyle(color: DokkoTokens.text, fontSize: 18)),
-        content: DokkoInput(
-          label: 'Nombre comercial',
-          controller: nameCtrl,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(DokkoTokens.radiusLg),
+          side: const BorderSide(color: DokkoTokens.line),
+        ),
+        titlePadding: const EdgeInsets.fromLTRB(24, 20, 24, 12),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+        actionsPadding: const EdgeInsets.fromLTRB(24, 16, 24, 20),
+        title: const Text(
+          'Renombrar Cliente',
+          style: TextStyle(
+            color: DokkoTokens.text,
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        content: SizedBox(
+          width: 360,
+          child: DokkoInput(
+            label: 'Nombre comercial',
+            controller: nameCtrl,
+          ),
         ),
         actions: [
           TextButton(

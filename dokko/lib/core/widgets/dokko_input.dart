@@ -25,6 +25,7 @@ class DokkoInput extends StatelessWidget {
   Widget build(BuildContext context) {
     final isMultiline = maxLines != null && maxLines! > 1;
     return Column(
+      mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
